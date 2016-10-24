@@ -39,5 +39,14 @@ captures/
 # Keystore files
 *.jks
 
-# ENV Files
-*.env
+
+# Virtual environments
+venv/
+env/
+
+# Python
+__pycache__/
+.cache/
+
+# Vim
+*.sw?
