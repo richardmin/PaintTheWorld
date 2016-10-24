@@ -20,6 +20,11 @@ should update the requirements file:
 $ pip freeze > requirements.txt
 ```
 
+To run tests, execute this command from the `Server/` directory:
+```bash
+$ pytest tests/
+```
+
 To return to the real world, run:
 ```bash
 $ deactivate

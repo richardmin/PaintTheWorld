@@ -45,7 +45,7 @@ class GameState:
         Returns:
             List of coordinate/team pairings of the form ((x,y), team_color).
         """
-        diff = a.grid - b.grid
+        diff = np.absolute(a.grid - b.grid)
         coord = np.nonzero(diff)
         val = diff[coord]
         coord = map(tuple, np.transpose(coord))  # turn coord into (x,y) tuples
