@@ -47,6 +47,8 @@ env/
 # Python
 __pycache__/
 .cache/
+*.pyc
+*.pyo
 
 # Vim
 *.sw?
