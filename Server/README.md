@@ -29,3 +29,8 @@ To return to the real world, run:
 ```bash
 $ deactivate
 ```
+
+To deploy on heroku,
+```bash
+$ git subtree push --prefix Server heroku master
+```
