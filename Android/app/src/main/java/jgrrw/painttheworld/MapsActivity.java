@@ -37,10 +37,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        // TODO: Disable camera movement. Maybe by using Lite mode?
+        // TODO: For Dickson court to work, landscape mode required. Is there a way to force this?
+        int choice = 1;
+        LatLng InvertedFountainCenter = new LatLng(34.070098, -118.440700);
+        LatLng DicksonCenter = new LatLng(34.072201, -118.442165);
+        LatLng Battleground = new LatLng(0, 0);
+        float zoomLevel = 19;
+        switch (choice){
+            case 0:
+                Battleground = InvertedFountainCenter;
+                zoomLevel = 19.6f;
+                break;
+            case 1:
+                Battleground = DicksonCenter;
+                zoomLevel = 19.1f;
+                break;
+        }
+        mMap.addMarker(new MarkerOptions().position(Battleground).title("Center of battleground."));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Battleground, zoomLevel));
     }
 }
