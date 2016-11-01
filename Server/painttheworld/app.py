@@ -22,7 +22,7 @@ def game_data():
     # request.form['magic']
     return '{fake json object, with updated data}'
 
-# TODO: Support multiple lobbies
+# TODO: Support multiple lobbies, probably in own file later
 @app.route('/join_lobby', methods=['GET', 'POST'])
 def join_lobby():
     if request.method == 'POST'
