@@ -32,9 +32,35 @@ proguard/
 # Android Studio captures folder
 captures/
 
-# Intellij
+# User-specific configurations
+**/.idea/libraries
+**/.idea/workspace.xml
+**/.idea/tasks.xml
 *.iml
-.idea/workspace.xml
+*.ipr
+*.iws
 
 # Keystore files
 *.jks
+
+# OS Files (ahem, Apple)
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Virtual environments
+virtualenv/
+venv/
+
+# Python
+__pycache__/
+.cache/
+*.pyc
+*.pyo
+
+# Vim
+*.sw?
