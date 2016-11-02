@@ -6,7 +6,7 @@
 __all__ = [ 'app' ]
 
 from flask import Flask, render_template, request
-import game
+from painttheworld.game import GameState
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -25,6 +25,6 @@ def game_data():
 # TODO: Support multiple lobbies, probably in own file later
 @app.route('/join_lobby', methods=['GET', 'POST'])
 def join_lobby():
-    if request.method == 'POST'
-        user_count++; 
+    if request.method == 'POST':
+        user_count += 1
     return '{users: \'{0}\', game_start_time: \'{1}\'}'.format(user_count, start_time)

@@ -36,7 +36,7 @@ class GameState:
         self.grid = np.zeros((size, size), dtype=np.int8)
         self.radius = radius
         length = len(coords)
-        self.center_coord = (sum(i for i, _ in coords)/length, sum(i for _, i in coords)/length
+        self.center_coord = sum(i for i, _ in coords)/length, sum(i for _, i in coords)/length
         self.longitude_conversion = calculateLongitudeToMiles(center_coord)
 
     def update(self, coord, team):
@@ -44,7 +44,7 @@ class GameState:
         x, y = coord
         self.grid[x][y] = team
 
-    def convert(self, coord)
+    def convert(self, coord):
         """ Casts a GPS coordinate onto the grid, predefined by center_coord
         """
         lon, lat = coord
