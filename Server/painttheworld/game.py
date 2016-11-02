@@ -2,7 +2,6 @@
 #
 # Represent and track the current game state.
 
-import msgpack as mp
 import numpy as np
 from math import radians, cos, sin, asin, sqrt
 
