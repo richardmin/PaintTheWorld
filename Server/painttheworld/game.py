@@ -11,8 +11,6 @@ NONE = 0
 RED = 1
 BLUE = 2
 
-
-
 class GameState:
     """Keeps track of which teams have colored which areas of the map.
 
@@ -40,7 +38,7 @@ class GameState:
         self.radius = radius
         length = len(coords)
         self.center_coord = (sum(i for i, _ in coords)/length, sum(i for _, i in coords)/length
-        self.longitude_conversion = calculateLongitudeToMiles(center_coord) 
+        self.longitude_conversion = calculateLongitudeToMiles(center_coord)
 
     def update(self, coord, team):
         """Update the game state array."""
@@ -51,8 +49,6 @@ class GameState:
         """ Casts a GPS coordinate onto the grid, predefined by center_coord
         """
         lon, lat = coord
-
-
 
     @staticmethod
     def diff(a, b):
@@ -76,22 +72,19 @@ class GameState:
         """
         # math.cos()
 
-    
     @staticmethod
-    def haversine(lon1, lat1, lon2, lat2): 
+    def haversine(lon1, lat1, lon2, lat2):
         """
-        Calculate the great circle distance between two points 
+        Calculate the great circle distance between two points
         on the earth (specified in decimal degrees)
         Source code from: http://stackoverflow.com/questions/15736995/how-can-i-quickly-estimate-the-distance-between-two-latitude-longitude-points
         """
-        # convert decimal degrees to radians 
+        # convert decimal degrees to radians
         lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
-        # haversine formula 
-        dlon = lon2 - lon1 
-        dlat = lat2 - lat1 
+        # haversine formula
+        dlon = lon2 - lon1
+        dlat = lat2 - lat1
         a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
-        c = 2 * asin(sqrt(a)) 
+        c = 2 * asin(sqrt(a))
         km = 6367 * c
         return km
-
-
