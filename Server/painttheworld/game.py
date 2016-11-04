@@ -12,6 +12,19 @@ RED = 1
 BLUE = 2
 
 
+# Set up "Constants"
+m1 = 111132.92;		# latitude calculation term 1
+m2 = -559.82;		# latitude calculation term 2
+m3 = 1.175;			# latitude calculation term 3
+m4 = -0.0023;		# latitude calculation term 4
+p1 = 111412.84;		# longitude calculation term 1
+p2 = -93.5;			# longitude calculation term 2
+p3 = 0.118;			# longitude calculation term 3
+
+
+
+
+
 
 class GameState:
     """Keeps track of which teams have colored which areas of the map.
@@ -47,7 +60,7 @@ class GameState:
         x, y = coord
         self.grid[x][y] = team
 
-    def convert(self, coord)
+    def convert(self, coord):
         """ Casts a GPS coordinate onto the grid, predefined by center_coord
         """
         lon, lat = coord
