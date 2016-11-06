@@ -45,7 +45,7 @@ class GameState:
                     vertical/horizontal direction.
 
             coords: a list of the 8 user locations (made when creating the lobby)
-                    The user locations should be tuples in the format x, y
+                    The user locations should be tuples in the format lat, lon
         """
         size = 2*radius + 1
         self.grid = np.zeros((size, size), dtype=np.int8)
@@ -79,12 +79,27 @@ class GameState:
 
     @staticmethod
     def calculateLongitudeToMiles(coord):
-        """Calculates the conversion rate for 1 degree of longitude to miles
+        """Calculates the conversion rate for 1 degree of longitude to a variety of measurements, returned in a dict. 
 
         Returns:
             Conversion rate for 1 degree of longitude to miles
         """
-        # math.cos()
+        latitude = math.radians(coord.lat);
+        dict = {};
+
+        latleng = m1 + (m2 * math.cos(2 * latitude) + (m3 * math.cos(4 * lat)) + (m4 * math.cos(6 * lat)))
+        longleng = (p1 * math.cos(lat)) + (p2 * math.cos(3 * lat)) + (p3 * math.cos(5 * lat))
+
+        dict['lat_meters'] = latleng
+        dict['lat_feet'] = latleng * 3.28083333
+        dict['lat_miles'] = dict['lat_feet'] / 5280;]
+        
+        dict['long_meters'] = longlen
+        dict['long_feet'] = longlen * 3.28083333
+        dict['long_miles'] = dict['long_feet'] / 5280;
+        
+	
+
 
     @staticmethod
     def haversine(lon1, lat1, lon2, lat2):
