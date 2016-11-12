@@ -11,6 +11,15 @@ from painttheworld.game import GameState
 app = Flask(__name__)
 app.config.from_object('config')
 
+
+max_users = 8
+radius = 50 #2500 tiles
+
+game_list = []
+active_game
+game_count = 0
+user_count = 0
+
 @app.route('/debug')
 def debug():
     return render_template('debug.html')
@@ -18,6 +27,7 @@ def debug():
 @app.route('/game_data', methods=['POST'])
 def game_data():
     # TODO: return actual JSON object
+    
     # request.form['location']
     # request.form['magic']
     return '{fake json object, with updated data}'
@@ -25,6 +35,9 @@ def game_data():
 # TODO: Support multiple lobbies, probably in own file later
 @app.route('/join_lobby', methods=['GET', 'POST'])
 def join_lobby():
+    global game, user_count
     if request.method == 'POST':
         user_count += 1
+        if user_count > max_users:
+            user_count = 1
     return '{users: \'{0}\', game_start_time: \'{1}\'}'.format(user_count, start_time)
