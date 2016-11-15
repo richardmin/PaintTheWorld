@@ -2,6 +2,7 @@ package jgrrw.painttheworld;
 
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.view.View;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -9,9 +10,12 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import android.content.Intent;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
-
+    public final static String GAME_END_STATUS = "painttheworld.GAME_END_STATUS";
+    public final static String RED_TEAM_SCORE = "painttheworld.RED_TEAM_SCORE";
+    public final static String BLUE_TEAM_SCORE = "painttheworld.BLUE_TEAM_SCORE";
     private GoogleMap mMap;
 
     @Override
@@ -58,5 +62,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         mMap.addMarker(new MarkerOptions().position(Battleground).title("Center of battleground."));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Battleground, zoomLevel));
+    }
+
+    /**
+     * Prepares data to be displayed in GameOverActivity and changes to GameOverActivity
+     * @param view
+     */
+    public void gameOver(View view){
+        Intent intent = new Intent(this, GameOverActivity.class);
+        //TODO: Get meaningful end game status from server. Possibly score as well?
+        //Current it just puts some meaningless placeholders
+        String status = "Victory!";
+        intent.putExtra(GAME_END_STATUS, status);
+        intent.putExtra(RED_TEAM_SCORE, 100);
+        intent.putExtra(BLUE_TEAM_SCORE, 150);
+        startActivity(intent);
     }
 }
