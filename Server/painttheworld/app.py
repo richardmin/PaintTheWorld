@@ -16,7 +16,7 @@ max_users = 8
 radius = 50 #2500 tiles
 
 game_list = []
-active_game
+#active_game
 game_count = 0
 user_count = 0
 
