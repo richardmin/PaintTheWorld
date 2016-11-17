@@ -34,16 +34,16 @@ def game_data():
 def join_lobby():
     global active_game, radius, gridsize
     if request.method == 'POST':
-        print(request.form)
-        if 'location' not in request.form.to_dict():
-            return '{error: \'location field not found\'}'
-            # return request.form.values()
+        
+        if 'lat' not in request.form.to_dict():
+            return '{error: \'lat field not found\'}'
+        if 'long' not in request.form.to_dict():
+            return '{error: \'long field not found\'}'
         if active_game is None:
             active_game = GameState(radius, gridsize) 
          
-        usernum = active_game.add_user(request.form['location'])
+        usernum = active_game.add_user(request.form['lat'], request.form['long'])
         
-        # what is this trash code
         if usernum is 8:
             return '{{user-id: {0}, user-count: {1}, game_start_time: {3}}}'.format(usernum, active_game.get_user_count(), active_game.get_start_time())
         else:    

@@ -48,7 +48,8 @@ class GameState:
         self.radius = radius
         self.gridsize = gridsize
         self.user_count = 0
-        self.coords = []
+        self.lat = []
+        self.lon = []
 
     def update(self, coord, team):
         """Update the game state array."""
@@ -60,13 +61,14 @@ class GameState:
         """
         lon, lat = coord
 
-    def add_user(self, coord):
+    def add_user(self, lat, lon):
         """ Adds a user and their starting location to the grid
         """
         if self.user_count < 8:
             self.user_count += 1
-            self.coords.extend(coord)
-            print(coord) 
+            self.lat.append(float(lat))
+            self.lon.append(float(lon))
+             
             if self.user_count == 8:
                 self.initialize_game()
             return self.user_count-1
@@ -86,9 +88,9 @@ class GameState:
 
     def initialize_game(self):
         """Initialize the starting position of the grid"""
-        length = len(self.coords)
-        self.center_coord = sum(i for i, _ in self.coords)/length, sum(i for _, i in self.coords)/length
-        self.longitude_conversion = calculateLongitudeToMiles(center_coord)
+        length = len(self.lat)
+        self.center_coord = sum(self.lat)/length, sum(self.lon)/length
+        self.longitude_conversion = calculateLongitude(center_coord)
         self.start_time = (datetime.datetime.now() + datetime.timedelta(minutes = 3))
     
 
