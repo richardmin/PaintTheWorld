@@ -11,33 +11,48 @@ from painttheworld.game import GameState
 app = Flask(__name__)
 app.config.from_object('config')
 
-
-max_users = 8
 radius = 50 #2500 tiles
+gridsize = 5 #5 feet per tile. 
 
-game_list = []
-active_game
-game_count = 0
-user_count = 0
+# game_list = []
+# game_count = 0
 
+active_game = None
 @app.route('/debug')
 def debug():
     return render_template('debug.html')
 
 @app.route('/game_data', methods=['POST'])
 def game_data():
-    # TODO: return actual JSON object
-    
+    global active_game
+    userid = request.form['user-id']
+
     # request.form['location']
-    # request.form['magic']
-    return '{fake json object, with updated data}'
+    # request.form['magic'] 
+    return '{{fake json object, with updated data}}'
 
 # TODO: Support multiple lobbies, probably in own file later
 @app.route('/join_lobby', methods=['GET', 'POST'])
 def join_lobby():
-    global game, user_count
+    global active_game, radius, gridsize
     if request.method == 'POST':
-        user_count += 1
-        if user_count > max_users:
-            user_count = 1
-    return '{users: \'{0}\', game_start_time: \'{1}\'}'.format(user_count, start_time)
+
+        if 'location' not in request.form.to_dict():
+            return '{error: \'location field not found\'}'
+            # return request.form.values()
+        if active_game is None:
+            active_game = GameState(radius, gridsize) 
+         
+        usernum = active_game.add_user(request.form['location'])
+        
+        # what is this trash code
+        if usernum is 8:
+            return '{{user-id: {0}, user-count: {1}, game_start_time: {3}}}'.format(usernum, active_game.get_user_count(), active_game.get_start_time())
+        else:    
+            return '{{user-id: {0}, user-count: {1}}}'.format(usernum, active_game.get_user_count())
+        
+    if active_game is None:
+        return '{error: \'No game in progress\'}'
+    elif active_game.get_user_count() < 8:
+        return '{{user-count: {0}}}'.format(active_game.get_user_count())
+    return '{{user-count: {0}, game_start_time: {1}}}'.format(active_game.get_user_count(), active_game.get_start_time())

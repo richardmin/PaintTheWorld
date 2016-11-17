@@ -3,6 +3,7 @@
 # Represent and track the current game state.
 
 import numpy as np
+import datetime
 from math import radians, cos, sin, asin, sqrt
 
 # Teams
@@ -37,25 +38,22 @@ class GameState:
           (0,0) is technically the center of our grid.
     """
 
-    def __init__(self, radius, coords, gridsize):
+    def __init__(self, radius, gridsize):
         """Create a GameState object.
 
         Args:
             radius: the number of grid blocks from the center block in the
                     vertical/horizontal direction.
 
-            coords: a list of the 8 user locations (made when creating the lobby)
-                    The user locations should be tuples in the format lat, lon
-
-            gridsize: The dimensions of a grid tile, in feet
+            gridsize: The dimensions of a grid tile, in feet. This should be the edge length
         """
         size = 2*radius + 1
         self.grid = np.zeros((size, size), dtype=np.int8)
         self.radius = radius
-        length = len(coords)
-        self.center_coord = sum(i for i, _ in coords)/length, sum(i for _, i in coords)/length
-        self.longitude_conversion = calculateLongitudeToMiles(center_coord)
+        
+        
         self.gridsize = gridsize
+        self.user_count = 0
 
     def update(self, coord, team):
         """Update the game state array."""
@@ -66,6 +64,37 @@ class GameState:
         """ Casts a GPS coordinate onto the grid, predefined by center_coord
         """
         lon, lat = coord
+
+    def add_user(self, coord):
+        """ Adds a user and their starting location to the grid
+        """
+        if self.user_count < 8:
+            self.user_count += 1
+            if self.user_count == 8:
+                self.initialize_game()
+            
+            return self.user_count-1
+        else:
+            return -1
+
+    def get_center_coord(self):
+        """Returns the center coordinate for the grid.
+        """
+        return self.center_coord
+        
+    def get_user_count(self):
+        return int(self.user_count)
+
+    def get_start_time(self):
+        return self.start_time.isoformat()
+
+    def initialize_game(self):
+        """Initialize the starting position of the grid"""
+        length = len(self.coords)
+        self.center_coord = sum(i for i, _ in self.coords)/length, sum(i for _, i in self.coords)/length
+        self.longitude_conversion = calculateLongitudeToMiles(center_coord)
+        self.start_time = (datetime.datetime.now() + datetime.timedelta(minutes = 3))
+    
 
     @staticmethod
     def diff(a, b):
