@@ -6,6 +6,7 @@ Endpoints:
 2. game_data
     * POST only, send GPS coordinates here, it returns grid deltas. Also include your user id, and your game id
         * Input Keys: user-id, lat, long. How post requests are formatted: http://stackoverflow.com/questions/14551194/how-are-parameters-sent-in-an-http-post-request
+        * Please ensure that the lat and long degrees have no extra markings (i.e. they're just raw numbers. Do _NOT_ include °N, for example.)
 
 3. join_lobby
     * POST sends a request to join the lobby, user-id (yours), as well as the remainder of the GET data 

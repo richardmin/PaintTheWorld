@@ -4,7 +4,8 @@
 
 import numpy as np
 import datetime
-from math import radians, cos, sin, asin, sqrt
+# from math import radians, cos, sin, asin, sqrt
+import math
 
 # Teams
 NONE = 0
@@ -21,6 +22,8 @@ p1 = 111412.84      # longitude calculation term 1
 p2 = -93.5          # longitude calculation term 2
 p3 = 0.118          # longitude calculation term 3
 
+
+''' Note that Latitude is North/South and Longitude is West/East'''
 
 class GameState:
     """Keeps track of which teams have colored which areas of the map.
@@ -90,9 +93,9 @@ class GameState:
         """Initialize the starting position of the grid"""
         length = len(self.lat)
         self.center_coord = sum(self.lat)/length, sum(self.lon)/length
-        self.longitude_conversion = calculateLongitude(center_coord)
+        self.longitude_conversion = self.calculateLongitude(self.center_coord)
+        print(self.longitude_conversion)
         self.start_time = (datetime.datetime.now() + datetime.timedelta(minutes = 3))
-    
 
     @staticmethod
     def diff(a, b):
@@ -108,25 +111,27 @@ class GameState:
         return list(zip(coord, val))
 
     @staticmethod
-    def convertLongitude(coord):
+    def calculateLongitude(coord):
         """Calculates the conversion rate for 1 degree of longitude to a variety of measurements, returned in a dict. 
 
         Returns:
             Conversion rate for 1 degree of longitude to miles
         """
-        latitude = math.radians(coord.lat)
+        latitude = math.radians(coord[1])
         dict = {}
 
-        latleng = m1 + (m2 * math.cos(2 * latitude) + (m3 * math.cos(4 * lat)) + (m4 * math.cos(6 * lat)))
-        longleng = (p1 * math.cos(lat)) + (p2 * math.cos(3 * lat)) + (p3 * math.cos(5 * lat))
+        latlen = m1 + (m2 * math.cos(2 * latitude) + (m3 * math.cos(4 * latitude)) + (m4 * math.cos(6 * latitude)))
+        longlen = (p1 * math.cos(latitude)) + (p2 * math.cos(3 * latitude)) + (p3 * math.cos(5 * latitude))
 
-        dict['lat_meters'] = latleng
-        dict['lat_feet'] = latleng * 3.28083333
+        dict['lat_meters'] = latlen
+        dict['lat_feet'] = latlen * 3.28083333
         dict['lat_miles'] = dict['lat_feet'] / 5280
         
         dict['long_meters'] = longlen
         dict['long_feet'] = longlen * 3.28083333
         dict['long_miles'] = dict['long_feet'] / 5280
+
+        return dict
 
     @staticmethod
     def haversine(lon1, lat1, lon2, lat2):
