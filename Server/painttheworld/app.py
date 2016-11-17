@@ -14,8 +14,6 @@ app.config.from_object('config')
 radius = 50 #2500 tiles
 gridsize = 5 #5 feet per tile. 
 
-# game_list = []
-# game_count = 0
 
 active_game = None
 @app.route('/debug')
