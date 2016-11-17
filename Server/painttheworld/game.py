@@ -46,10 +46,9 @@ class GameState:
         size = 2*radius + 1
         self.grid = np.zeros((size, size), dtype=np.int8)
         self.radius = radius
-        
-        
         self.gridsize = gridsize
         self.user_count = 0
+        self.coords = []
 
     def update(self, coord, team):
         """Update the game state array."""
@@ -66,9 +65,10 @@ class GameState:
         """
         if self.user_count < 8:
             self.user_count += 1
+            self.coords.extend(coord)
+            print(coord) 
             if self.user_count == 8:
                 self.initialize_game()
-            
             return self.user_count-1
         else:
             return -1

@@ -34,7 +34,7 @@ def game_data():
 def join_lobby():
     global active_game, radius, gridsize
     if request.method == 'POST':
-
+        print(request.form)
         if 'location' not in request.form.to_dict():
             return '{error: \'location field not found\'}'
             # return request.form.values()
