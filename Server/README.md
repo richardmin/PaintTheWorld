@@ -11,7 +11,7 @@ $ pip install -r requirements.txt  # install python dependencies inside venv
 
 To launch the server, make sure you're in your virtual environment and run:
 ```bash
-$ ./launch.sh
+$ ./run.py
 ```
 
 If you've installed a new python package inside your virtual environment, you
@@ -28,4 +28,9 @@ $ pytest tests/
 To return to the real world, run:
 ```bash
 $ deactivate
+```
+
+To deploy on heroku,
+```bash
+$ git subtree push --prefix Server heroku master
 ```
