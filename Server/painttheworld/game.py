@@ -92,8 +92,8 @@ class GameState:
         else:
             return -1
 
-    def update_user(self, id, lat, lon):
-        if id < 0 or id >= lobby_size
+    #def update_user(self, id, lat, lon):
+        #if id < 0 or id >= lobby_size
 
     @staticmethod
     def diff(a, b):

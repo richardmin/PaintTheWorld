@@ -24,9 +24,9 @@ def validate_latitude(latitude):
 
 # Serves a web page that lets the user join a lobby.
 # Stores user data in a session
-#@app.route('/')
-#def lobby():
-#    return render_template('index.html')
+@app.route('/')
+def lobby():
+    return render_template('index.html')
 
 @app.route('/debug')
 def debug():
