@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import android.widget.Button;
@@ -26,13 +27,14 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         b1 = (Button) findViewById(R.id.JoinButton);
         tx1 = (TextView) findViewById(R.id.AboutText);
-        tx1.setText("Hello, welcome to PaintTheWorld!");
+        tx1.setTextSize(30);
+        tx1.setText("\n\nHello!\n\nWelcome to\nPaintTheWorld!");
     }
 
     public void joinGame(View view) throws JSONException
     {
         RequestQueue queue = Volley.newRequestQueue(this);
-        String url ="http://our_url.com/join_lobby";
+        String url ="http://ec2-54-153-39-233.us-west-1.compute.amazonaws.com/join_lobby";
 
         try {
             final JSONObject jsonBody = new JSONObject("{\"lat\":\"37.014298129\", \"long\":\"50.0:w\"}");
@@ -44,6 +46,7 @@ public class LoginActivity extends AppCompatActivity {
                 public void onResponse(JSONObject response) {
                     // Do stuff here, successful request
                     try {
+                        Log.d("RESPONSE", response.toString());
                         int UserID = response.getInt("user-id");
                         if (UserID != -1) {
                             Intent intent = new Intent(LoginActivity.this, MapsActivity.class);
