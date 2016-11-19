@@ -9,6 +9,7 @@ Endpoints:
         * Please ensure that the lat and long degrees have no extra markings (i.e. they're just raw numbers. Do _NOT_ include °N, for example.)
 
 3. join_lobby
+    * No input/output keys. We use POST/GET to differentiate between joining the lobby and polling.
     * POST sends a request to join the lobby, user-id (yours), as well as the remainder of the GET data 
     * GET should returns game_start_time in ISO 8601, if the game is starting. It will also have the central GPS location. 
     * Note if there is a game in progress, or the users are already maxed out we return an error in the format. What this effectively means is that you get user-id is -1 and not anything.
@@ -92,8 +93,11 @@ Add android.permission.INTERNET to the app manifest.
         To access data in JSONObject, take the appropriate type. 
 
         ``` String jsonString = obj.getString("stringkey"); ```
+
         ``` boolean jsonBoolean = obj.getBoolean("booleankey"); ```
+
         ``` int jsonInt = obj.getInt("intkey"); ```
+
         ``` JSONArray jsonArray = obj.getJSONArray("arraykey"); ```
 
         More info here: http://stackoverflow.com/questions/9605913/how-to-parse-json-in-android
