@@ -7,7 +7,6 @@ __all__ = [ 'app' ]
 
 from flask import Flask, render_template, request
 from painttheworld.game import GameState
-import painttheworld.game
 
 app = Flask(__name__)
 app.config.from_object('config')
