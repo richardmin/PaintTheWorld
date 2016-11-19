@@ -60,10 +60,10 @@ Add android.permission.INTERNET to the app manifest.
 
         final JSONObject jsonBody = new JSONObject("{\"type\":\"example\"}");
         // Request a string response from the provided URL.
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(url, jsonBody
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(url, jsonBody,
                     new Response.Listener<JsonObject>() {
             @Override
-            public void onResponse(String response) {
+            public void onResponse(JSONObject response) {
                 // Do stuff here, successful request
             }
         }, new Response.ErrorListener() {
