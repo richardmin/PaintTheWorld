@@ -204,6 +204,7 @@ public class MapsActivity extends FragmentActivity implements
         mMap.getUiSettings().setRotateGesturesEnabled(false);
 
         String red = "#77FF0000";
+        //Drawing a test rectangle
         double top_lat = Battleground.latitude + 0.0001;
         double bottom_lat = Battleground.latitude - 0.0001;
         double top_long = Battleground.longitude + 0.0001;
@@ -216,15 +217,5 @@ public class MapsActivity extends FragmentActivity implements
                 .fillColor(Color.parseColor(red));
 
         Polygon square = mMap.addPolygon(polygonOptions);
-        /*
-        for (int i = -5;  i < 5; i++) {
-            PolylineOptions options = new PolylineOptions();
-            options.add(new LatLng(top_lat, top_long));
-            options.add(new LatLng(bottom_lat, bottom_long));
-            top_lat += radius;
-            bottom_lat += radius;
-            mMap.addPolyline(options.width(3));
-
-        }*/
     }
 }
