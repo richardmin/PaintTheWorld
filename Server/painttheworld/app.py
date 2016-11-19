@@ -33,13 +33,19 @@ def game_data():
         return '{error: \'data format invalid\'}'
     if active_game is None or active_game.start_time is None:
         return '{error: \'No Game In Progress\'}'
-    if request.form['id'] < 0 or request.form['id'] >= game.lobby_size:
+    if request.form['user-id'] < 0 or request.form['user-id'] >= game.lobby_size:
         return '{error: \'Invalid user id\'}'
 
     if not validate_latitude(request.form['lat']):
         return '{error: \'Invalid latitude degree\'}'
     if not validate_longitude(request.form['long']):
         return '{error: \'Invalid longitude degree\'}'
+
+    if request.form['id'] >= game.lobby_size or request.form['id'] < 0:
+        return '{error: \'Invalid user id\'}'
+    
+    
+    
     active_game.update_user(request.form['id'], request.form['long'], request.form['lat'])
 
 
