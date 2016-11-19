@@ -5,7 +5,7 @@
 
 __all__ = [ 'app' ]
 
-from flask import Flask, render_template, request
+from flask import Flask, json, render_template, request
 from painttheworld.game import GameState
 import painttheworld.game
 
@@ -21,6 +21,12 @@ def validate_longitude(longitude):
     return longitude >= -180 and longitude <= 180
 def validate_latitude(latitude):
     return latitude >= -90 and latitude <= 90
+
+# Serves a web page that lets the user join a lobby.
+# Stores user data in a session
+#@app.route('/')
+#def lobby():
+#    return render_template('index.html')
 
 @app.route('/debug')
 def debug():
@@ -49,6 +55,7 @@ def game_data():
 @app.route('/join_lobby', methods=['GET', 'POST'])
 def join_lobby():
     global active_game, radius, gridsize
+
     if request.method == 'POST':
         if 'lat' not in request.form.to_dict():
             return '{error: \'lat field not found\'}'

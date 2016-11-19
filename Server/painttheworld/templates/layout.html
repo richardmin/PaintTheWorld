@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Paint the World</title>
+
+  <!-- FONT -->
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+  <!-- CSS  -->
+  <link rel="stylesheet" href="{{url_for('static', filename='normalize.css')}}">
+  <link rel="stylesheet" href="{{url_for('static', filename='skeleton.css')}}">
+  <link rel="stylesheet" href="{{url_for('static', filename='custom.css')}}">
+</head>
+<body>
+  <div class="container">
+    {% block body %}{% endblock %}
+  </div>
+</body>
+</html>
+
+<!-- vim: set cc=101 ts=2 sw=2 sts=2 expandtab syntax=htmldjango: -->
