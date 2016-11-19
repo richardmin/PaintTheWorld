@@ -22,6 +22,8 @@ p1 = 111412.84      # longitude calculation term 1
 p2 = -93.5          # longitude calculation term 2
 p3 = 0.118          # longitude calculation term 3
 
+lobby_size = 8
+
 
 ''' Note that Latitude is North/South and Longitude is West/East'''
 
@@ -54,48 +56,44 @@ class GameState:
         self.lat = []
         self.lon = []
 
+
+    def initialize_game(self):
+        """Initialize the starting position of the grid
+            This calculates the center coordinate by average the longitudes and latitudes of all people. (this might not work too well, as that's not really how nautical miles work')
+            Additionally, it sets the start time to be 3 seconds from now"""
+        length = len(self.lat)
+        self.center_coord = sum(self.lat)/length, sum(self.lon)/length
+        self.longitude_conversion = self.calculateLongitude(self.center_coord)
+        self.start_time = (datetime.datetime.now() + datetime.timedelta(seconds = 3))
+
     def update(self, coord, team):
         """Update the game state array."""
         x, y = coord
         self.grid[x][y] = team
 
     def convert(self, coord):
-        """ Casts a GPS coordinate onto the grid, predefined by center_coord
+        """ Casts a GPS coordinate onto the grid, which has it's central locations defined by center_coord
         """
         lon, lat = coord
 
     def add_user(self, lat, lon):
-        """ Adds a user and their starting location to the grid
+        """ Adds a user and their starting location to the grid.
+            Returns the user id number assosciated with that user, as well as their locations.
+            If there are enough users to begin the game, it initializes the game variables. 
         """
-        if self.user_count < 8:
+        if self.user_count < lobby_size:
             self.user_count += 1
             self.lat.append(float(lat))
             self.lon.append(float(lon))
              
-            if self.user_count == 8:
+            if self.user_count == lobby_size:
                 self.initialize_game()
             return self.user_count-1
         else:
             return -1
 
-    def get_center_coord(self):
-        """Returns the center coordinate for the grid.
-        """
-        return self.center_coord
-        
-    def get_user_count(self):
-        return int(self.user_count)
-
-    def get_start_time(self):
-        return self.start_time.isoformat()
-
-    def initialize_game(self):
-        """Initialize the starting position of the grid"""
-        length = len(self.lat)
-        self.center_coord = sum(self.lat)/length, sum(self.lon)/length
-        self.longitude_conversion = self.calculateLongitude(self.center_coord)
-        print(self.longitude_conversion)
-        self.start_time = (datetime.datetime.now() + datetime.timedelta(minutes = 3))
+    def update_user(self, id, lat, lon):
+        if id < 0 or id >= lobby_size
 
     @staticmethod
     def diff(a, b):
