@@ -6,27 +6,9 @@ import numpy as np
 import datetime
 # from math import radians, cos, sin, asin, sqrt
 import math
-
-# Teams
-NONE = 0
-RED = 1
-BLUE = 2
-
-
-# Set up "Constants"
-m1 = 111132.92      # latitude calculation term 1
-m2 = -559.82        # latitude calculation term 2
-m3 = 1.175          # latitude calculation term 3
-m4 = -0.0023        # latitude calculation term 4
-p1 = 111412.84      # longitude calculation term 1
-p2 = -93.5          # longitude calculation term 2
-p3 = 0.118          # longitude calculation term 3
-
-lobby_size = 8
-
+from painttheworld.constants.GPS import m1, m2, m3, m4, p1, p2, p3
 
 ''' Note that Latitude is North/South and Longitude is West/East'''
-
 class GameState:
     """Keeps track of which teams have colored which areas of the map.
 
@@ -92,8 +74,8 @@ class GameState:
         else:
             return -1
 
-    def update_user(self, id, lat, lon):
-        if id < 0 or id >= lobby_size
+    #def update_user(self, id, lat, lon):
+    #   if id < 0 or id >= lobby_size
 
     @staticmethod
     def diff(a, b):

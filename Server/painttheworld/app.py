@@ -6,16 +6,10 @@
 __all__ = [ 'app' ]
 
 from flask import Flask, render_template, request
-from painttheworld.game import GameState
-import painttheworld.game
+from painttheworld.constants import active_game, radius, gridsize
 
 app = Flask(__name__)
 app.config.from_object('config')
-
-radius = 50 #2500 tiles
-gridsize = 5 #5 feet per tile. 
-
-active_game = None
 
 def validate_longitude(longitude):
     return longitude >= -180 and longitude <= 180
@@ -46,9 +40,11 @@ def game_data():
     return '{{}}'
 
 # TODO: Support multiple lobbies, probably in own file later
+# TODO: Make a game manager class that is in charge of cycling game state (a
+# game statemachine basically)
 @app.route('/join_lobby', methods=['GET', 'POST'])
 def join_lobby():
-    global active_game, radius, gridsize
+    global active_game
     if request.method == 'POST':
         if 'lat' not in request.form.to_dict():
             return '{error: \'lat field not found\'}'
@@ -59,7 +55,7 @@ def join_lobby():
         if not validate_longitude(request.form['long']):
             return '{error: \'Invalid longitude degree\'}'
         if active_game is None:
-            active_game = GameState(radius, gridsize) 
+            active_game = GameState(radius, gridsize)
          
         usernum = active_game.add_user(request.form['lat'], request.form['long'])
         
