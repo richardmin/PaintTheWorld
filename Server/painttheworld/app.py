@@ -60,15 +60,12 @@ class Lobby(Resource):
             return {'error': 'Invalid coordinates'}, 400
         if active_game is None:
             active_game = GameState(constants.radius, constants.gridsize)
-        usernum = active_game.add_user(request.form['lat'], request.form['long'])
 
-        resp = {
+        usernum = active_game.add_user(request.form['lat'], request.form['long'])
+        return {
             'user-id': usernum,
             'user-count': constants.lobby_size
         }
-        if active_game.user_count is constants.lobby_size:
-            resp['game-start-time'] = active_game.start_time.isoformat()
-        return resp
 
     def get(self):
         if active_game is None:
