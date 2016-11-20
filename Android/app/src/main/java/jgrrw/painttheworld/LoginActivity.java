@@ -83,20 +83,10 @@ public class LoginActivity extends AppCompatActivity implements
         Log.d("LOCATION:", mLocation.getLatitude() + ", " + mLocation.getLongitude());
     }
 
-<<<<<<< HEAD
-    public void joinGame(View view) throws JSONException {
-        String UserLocationLat = Double.toString(34.070098);
-        String UserLocationLong = Double.toString(-118.440700); //Testing Inverted Fountain Coordinates
 
-        ConnectionTask task = new ConnectionTask();
-        String[] params = new String[2];
-        params[0] = UserLocationLat;
-        params[1] = UserLocationLong;
-        task.execute(params);
-=======
     public void joinGame(View view) throws JSONException
     {
-        JConnectionTask task = new ConnectionTask();
+        ConnectionTask task = new ConnectionTask();
         String[] params = new String[2];
         params[0] = String.valueOf(mLocation.getLatitude());
         params[1] = String.valueOf(mLocation.getLongitude());
@@ -130,7 +120,7 @@ public class LoginActivity extends AppCompatActivity implements
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
->>>>>>> 3aa092717be43d89bb89060d4a480bf09ee9d45c
+
     }
 
 
