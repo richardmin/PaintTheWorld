@@ -4,7 +4,6 @@
 
 import numpy as np
 import datetime
-# from math import radians, cos, sin, asin, sqrt
 import math
 from painttheworld.constants.GPS import m1, m2, m3, m4, p1, p2, p3
 
