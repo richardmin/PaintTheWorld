@@ -42,12 +42,14 @@ public class MapsActivity extends FragmentActivity implements
     private TimerTask timerTask;
     private Timer timer;
     private GoogleApiClient mGoogleApiClient;
-    private android.location.Location mLastLocation;
+    private android.location.Location mLocation = new android.location.Location("");
     private static final String TAG = "MapsActivity";
     private LocationRequest locationRequest;
     private LocationListener locationListener;
     public static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 0;
     private com.google.android.gms.location.FusedLocationProviderApi fusedLocationProviderApi;
+
+
 
     public String latitude_string = "";
     public String longitude_string = "";
@@ -67,9 +69,9 @@ public class MapsActivity extends FragmentActivity implements
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
 
         getLocation();
@@ -82,18 +84,9 @@ public class MapsActivity extends FragmentActivity implements
         final TextView textView = new TextView(this);
 
 
-        timer = null;
 
-        //Main game logic loop
-        timerTask = new TimerTask() {
-
-            @Override
-            public void run() {
-                //Put game logic here...like the posting to server/updates/whatever
-
-            }
-        };
     }
+
 
     //Methods for Google Play Services Location
     private void getLocation() {
@@ -114,6 +107,7 @@ public class MapsActivity extends FragmentActivity implements
 
     @Override
     public void onLocationChanged(android.location.Location location) {
+        mLocation.set(location);
         Log.d("LOCATION:", location.getLatitude() + ", " + location.getLongitude());
     }
 
@@ -167,55 +161,109 @@ public class MapsActivity extends FragmentActivity implements
         timer = null;
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+    private double startX;
+    private double startY;
+    private double blockSize;
+    private int[][] gameGrid;
 
-        int choice = 1;
-        LatLng InvertedFountainCenter = new LatLng(34.070098, -118.440700);
-        LatLng DicksonCenter = new LatLng(34.072201, -118.442165);
-        LatLng Battleground = new LatLng(0, 0);
-        float zoomLevel = 19;
-        switch (choice){
-            case 0:
-                Battleground = InvertedFountainCenter;
-                zoomLevel = 19.6f;
-                break;
-            case 1:
-                Battleground = DicksonCenter;
-                zoomLevel = 19.1f;
-                break;
-        }
-        mMap.addMarker(new MarkerOptions().position(Battleground).title("Center of battleground."));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Battleground, zoomLevel));
-        mMap.getUiSettings().setScrollGesturesEnabled(false); //Disable camera movement
-        mMap.getUiSettings().setZoomControlsEnabled(false); //Disable camera zoom? doesnt seem to work
-        mMap.getUiSettings().setAllGesturesEnabled(false);
-        mMap.getUiSettings().setRotateGesturesEnabled(false);
+    public void drawPaintAt(int x, int y, int colorCode) {
 
-        String red = "#77FF0000";
-        //Drawing a test rectangle
-        double top_lat = Battleground.latitude + 0.0001;
-        double bottom_lat = Battleground.latitude - 0.0001;
-        double top_long = Battleground.longitude + 0.0001;
-        double bottom_long = Battleground.longitude - 0.0001;
+        String color;
+        if(colorCode == 1)
+            color = "#88FF0000"; // red
+        else if (colorCode == 2)
+            color = "#880000FF";  // blue
+        else
+            return;
+
+        double top_lat     =  startX + y*blockSize + blockSize/2;
+        double bottom_lat  =  startX + y*blockSize - blockSize/2;
+        double top_long    =  startY + x*blockSize + blockSize/2;
+        double bottom_long =  startY + x*blockSize - blockSize/2;
 
         PolygonOptions polygonOptions = new PolygonOptions()
                 .add(new LatLng(top_lat, top_long), new LatLng(top_lat, bottom_long),
                         new LatLng(bottom_lat, bottom_long), new LatLng(bottom_lat, top_long))
                 .strokeWidth(0)
-                .fillColor(Color.parseColor(red));
+                .fillColor(Color.parseColor(color));
 
         Polygon square = mMap.addPolygon(polygonOptions);
     }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
+        // This information needs to be obtained from the server during login time.
+        // TODO: Change these to intents - obtain information from the login activity.
+        double centerX = 34.072201;
+        double centerY = -118.442165;
+        double startTime = 0;
+        double endTime = 0;
+        int length = 100;
+        blockSize = 0.00001;
+
+        // This grid contains the locations of all the paint on the map.
+        // Each location needs to be mapped to a coordinate before it can be painted.
+        // Lower left position of the grid is mapped to startX and startY - simply map by multiplying x and y by blockSize and adding to startY and startX.
+        // 0 = empty
+        // 1 = red
+        // 2 = blue
+        startX = centerX - (length/2) * blockSize;
+        startY = centerY - (length/2) * blockSize;
+        gameGrid = new int[length][length];
+        LatLng battlegroundCenter = new LatLng(centerX, centerY);
+        float zoomLevel = 19.1f;
+
+        mMap.addMarker(new MarkerOptions().position(battlegroundCenter).title("Center of battleground."));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(battlegroundCenter, zoomLevel));
+        //Disable camera movement
+        mMap.getUiSettings().setScrollGesturesEnabled(true);
+        mMap.getUiSettings().setZoomControlsEnabled(false);
+        mMap.getUiSettings().setAllGesturesEnabled(true);
+        mMap.getUiSettings().setRotateGesturesEnabled(false);
+
+        // Draw square around arena.
+        String color = "#2500FF00"; // green
+        double top_lat     =  startX + length * blockSize;
+        double bottom_lat  =  startX;
+        double top_long    =  startY + length * blockSize;
+        double bottom_long =  startY;
+        PolygonOptions polygonOptions = new PolygonOptions()
+                .add(new LatLng(top_lat, top_long), new LatLng(top_lat, bottom_long),
+                        new LatLng(bottom_lat, bottom_long), new LatLng(bottom_lat, top_long))
+                .strokeWidth(0)
+                .fillColor(Color.parseColor(color));
+        Polygon square = mMap.addPolygon(polygonOptions);
+
+        timer = null;
+        //Main game logic loop
+        timerTask = new TimerTask() {
+
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable()
+                {
+                    public void run()
+                    {
+                        // TODO: Insert code here that fetches x, y, colorCode from server.
+                        int x = 0;
+                        int y = 0;
+                        int colorCode = 1;
+                        drawPaintAt(x, y, colorCode);
+                        gameGrid[x][y] = colorCode;
+
+                        // TODO: Insert code here that sends currentX, currentY coordinates to server.
+                        double currentX = mLocation.getLongitude();
+                        double currentY = mLocation.getLatitude();
+
+                        // TODO: End game (by switching to end game Activity) once end-time is reached.
+
+                    }
+                });
+            }
+        };
+    }
+
 }
