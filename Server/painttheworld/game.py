@@ -129,7 +129,7 @@ class GameState:
 
     def update_user(self, id, lon, lat):
         gridloc = project(lon, lat)
-        out_of_bounds = gridloc[0] is out of range or gridloc[1] is out of range
+        out_of_bounds = check_grid_range(gridloc[0], gridloc[1])
         
         if not out_of_bounds:
             self.grid[gridloc[0]][gridloc[1]] = constants.Team.findTeam(id)
@@ -138,8 +138,9 @@ class GameState:
         self.user_grid[id] = self.grid
         return returngrid, out_of_bounds
 
-    def check_grid_range(self, x, y):
-        return x >= 0 and y >=0 and x < constants.radius*2+1 and y < constants.radius*2+1
+    def check_grid_range(self, coord):
+        return coord[0] >= 0                   and coord[1] >=0 
+           and coord[0] < constants.radius*2+1 and coord[1] < constants.radius*2+1
          
     @staticmethod
     def diff(a, b):
