@@ -51,11 +51,12 @@ class GameData(Resource):
 class Lobby(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('lat', type=int, location='form', required=True)
-        self.parser.add_argument('long', type=int, location='form', required=True)
+        self.parser.add_argument('lat', type=float, location='form', required=True)
+        self.parser.add_argument('long', type=float, location='form', required=True)
 
     def post(self):
-        args = self.parser.parse()
+        global active_game
+        args = self.parser.parse_args()
         if not validate_coordinates((args['long'], args['lat'])):
             return {'error': 'Invalid coordinates'}, 400
         if active_game is None:
@@ -74,7 +75,7 @@ class Lobby(Resource):
         resp = {
             'user-count': active_game.user_count
         }
-        if active_game.user_count == game.lobby_size:
+        if active_game.user_count == constants.lobby_size:
             resp['game-start-time'] = active_game.start_time.isoformat()
             resp['center-coord'] = active_game.center_coord
             resp['radius'] = constants.radius

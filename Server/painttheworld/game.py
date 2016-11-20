@@ -5,7 +5,8 @@
 import numpy as np
 import datetime
 import math
-from painttheworld.constants.GPS import m1, m2, m3, m4, p1, p2, p3
+from painttheworld import constants
+from painttheworld.constants import m1, m2, m3, m4, p1, p2, p3
 
 ''' Note that Latitude is North/South and Longitude is West/East'''
 class GameState:
@@ -89,10 +90,10 @@ class GameState:
         locations.  If there are enough users to begin the game, it initializes
         the game variables. 
         """
-        if self.user_count < lobby_size:
+        if self.user_count < constants.lobby_size:
             self.user_count += 1
             self.user_coords.append((lat, lon))
-            if self.user_count == lobby_size:
+            if self.user_count == constants.lobby_size:
                 self.start_game()
             return self.user_count-1
         else:
