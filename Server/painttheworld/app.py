@@ -65,7 +65,7 @@ class Lobby(Resource):
         usernum = active_game.add_user(request.form['lat'], request.form['long'])
         return {
             'user-id': usernum,
-            'user-count': constants.lobby_size
+            'user-count': active_game.user_count
         }
 
     def get(self):
