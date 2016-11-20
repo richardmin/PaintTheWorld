@@ -26,27 +26,30 @@ class GameState:
 
         Args:
             radius: the number of grid blocks from the center block in the
-                    vertical/horizontal direction.
+                vertical/horizontal direction.
 
-            gridsize: The dimensions of a grid tile, in feet. This should be the edge length
+            gridsize: The dimensions of a grid tile, in feet. This should be the
+                edge length
         """
         size = 2*radius + 1
         self.grid = np.zeros((size, size), dtype=np.int8)
         self.radius = radius
         self.gridsize = gridsize
         self.user_count = 0
-        self.lat = []
-        self.lon = []
+        self.user_coords = []
 
+    def start_game(self):
+        """Initialize the starting position of the grid.
 
-    def initialize_game(self):
-        """Initialize the starting position of the grid
-            This calculates the center coordinate by average the longitudes and latitudes of all people. (this might not work too well, as that's not really how nautical miles work')
-            Additionally, it sets the start time to be 3 seconds from now"""
-        length = len(self.lat)
-        self.center_coord = sum(self.lon)/length, sum(self.lat)/length
+        This calculates the center coordinate by average the longitudes and
+        latitudes of all people (this might not work too well, as that's not
+        really how nautical miles work). Additionally, it sets the start time to
+        be 3 seconds from now.
+        """
+        length = len(self.user_coords)
+        self.center_coord = np.mean(self.user_coords, axis=1)
         self.longitude_conversion = self.calculateLongitude(self.center_coord)
-        self.start_time = (datetime.datetime.now() + datetime.timedelta(seconds = 3))
+        self.start_time = (datetime.datetime.now() + datetime.timedelta(seconds=3))
 
     def update(self, coord, team):
         """Update the game state array."""
@@ -54,7 +57,8 @@ class GameState:
         self.grid[x][y] = team
 
     def convert(self, lon, lat):
-        """ Casts a GPS coordinate onto the grid, which has it's central locations defined by center_coord
+        """ Casts a GPS coordinate onto the grid, which has it's central
+        locations defined by center_coord.
         """
         vert = haversine(self.center_coord[0], self.center_coord[1], self.center_coord[0], lat) # longitude is east-west, we ensure that's the sam'
         horiz = haversine(self.center_coord[0], self.center_coord[1], lon, self.center_coord[1])
@@ -90,24 +94,20 @@ class GameState:
         elif self.center_coord[0] < 0 and lon > 0:
         elif self.center_coord[0] > 0 and lon < 0:
             horiz = -horiz
-                
-            
-        vert = vert/self.gridsize + 25
-        horiz = horiz/self.gridsize + 25
 
-        return vert, horiz
-    
+            
     def add_user(self, lat, lon):
         """ Adds a user and their starting location to the grid.
-            Returns the user id number assosciated with that user, as well as their locations.
-            If there are enough users to begin the game, it initializes the game variables. 
+
+        Returns the user id number assosciated with that user, as well as their
+        locations.  If there are enough users to begin the game, it initializes
+        the game variables. 
         """
         if self.user_count < lobby_size:
             self.user_count += 1
-            self.lat.append(float(lat))
-            self.lon.append(float(lon))
+            self.user_coords.append((lat, lon))
             if self.user_count == lobby_size:
-                self.initialize_game()
+                self.start_game()
             return self.user_count-1
         else:
             return -1
@@ -131,7 +131,8 @@ class GameState:
 
     @staticmethod
     def conversion_rates(coord):
-        """Calculates the conversion rate for 1 degree of longitude to a variety of measurements, returned in a dict. 
+        """Calculates the conversion rate for 1 degree of longitude to a variety
+        of measurements, returned in a dict. 
             
         Args: 
             coord: a tuple (longitude, latitude) 
@@ -141,8 +142,13 @@ class GameState:
         latitude = math.radians(coord[1])
         dict = {}
 
-        latlen = m1 + (m2 * math.cos(2 * latitude) + (m3 * math.cos(4 * latitude)) + (m4 * math.cos(6 * latitude)))
-        longlen = (p1 * math.cos(latitude)) + (p2 * math.cos(3 * latitude)) + (p3 * math.cos(5 * latitude))
+        latlen = m1 + (m2 * math.cos(2 * latitude) +
+                      (m3 * math.cos(4 * latitude)) +
+                      (m4 * math.cos(6 * latitude)))
+
+        longlen = (p1 * math.cos(latitude)) +
+                  (p2 * math.cos(3 * latitude)) +
+                  (p3 * math.cos(5 * latitude))
 
         dict['lat_meters'] = latlen
         dict['lat_feet'] = latlen * 3.28083333
