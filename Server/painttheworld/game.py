@@ -70,7 +70,7 @@ class GameState:
         if lat > self.center_coord[1]:
             vert = -vert
 
-        """ Vectorizes the longitude. The degree anges from -180 to 180.
+        """ Vectorizes the longitude. The degree ranges from -180 to 180.
             There's three cases: 
                 1. They're both in the same hemisphere (east/west)
                 2. They cross over the 0 degree line
@@ -80,22 +80,38 @@ class GameState:
                 If the longitude of the location is less than the longitude of the cenral
                 location, that means that we need to move left in the array. 
                 We change the sign to be negative
+            Case (2) + (3):
+                There's two cases here, where the signs are differing. 
+                To determine which line we're crossing, the absolute value of the difference
+                in Longitudes is taken. If the difference >180, 
+                that implies that the 180 degree is being crossed. Otherwise, it's the 0 degree line.
+
             Case (2):
-                
+                In case (2), if the longitude of the central point is negative, the distance must be positive.
+                If the longitude of the central point is positive, the distance must be negative.
+            
             Case (3):
+                In case (3), if the longitude of the central point is negative, the distance must be negative.
+                If the longitude of the central point is positive, the distance must be positive.
 
         """
-        if np.sign(self.center_coord[0]) == np.sign(lon):
+        if np.sign(self.center_coord[0]) == np.sign(lon): # Case 1
             if lon < self.center_coord:
                 horiz = -horiz
-        elif self.center_coord[0] < 0 and lon < 0:
-            if lon < self.center_coord: 
+        if math.fabs(self.cener_coord[0] - lon) < 180: # Case 2
+            if self.center_coord[0] >= 0:
                 horiz = -horiz
-        elif self.center_coord[0] < 0 and lon > 0:
-        elif self.center_coord[0] > 0 and lon < 0:
+        else if self.center_coord < 0: # Case 3
             horiz = -horiz
-
             
+        horiz = math.floor(horiz / 1000 / gridsize)
+        vert = math.floor(vert / 1000 / gridsize)
+
+        return radius + 1 + horiz, radius + 1 + vert
+
+
+
+
     def add_user(self, lat, lon):
         """ Adds a user and their starting location to the grid.
 
