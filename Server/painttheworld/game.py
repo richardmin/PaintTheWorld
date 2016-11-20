@@ -4,8 +4,8 @@
 
 import numpy as np
 import datetime
-# from math import radians, cos, sin, asin, sqrt
 import math
+from painttheworld import constants
 from painttheworld.constants.GPS import m1, m2, m3, m4, p1, p2, p3
 
 ''' Note that Latitude is North/South and Longitude is West/East'''
@@ -37,6 +37,7 @@ class GameState:
         self.gridsize = gridsize
         self.user_count = 0
         self.user_coords = []
+        self.user_grid = []
 
     def start_game(self):
         """Initialize the starting position of the grid.
@@ -48,7 +49,7 @@ class GameState:
         """
         length = len(self.user_coords)
         self.center_coord = np.mean(self.user_coords, axis=1)
-        self.longitude_conversion = self.calculateLongitude(self.center_coord)
+        self.conversion_ratesn = self.conversion_rates(self.center_coord)
         self.start_time = (datetime.datetime.now() + datetime.timedelta(seconds=3))
 
     def update(self, coord, team):
@@ -77,9 +78,10 @@ class GameState:
                 3. They cross over the 180 degree line
             
             Case (1):
+                Check for case 1 by ensuring that the signs are identical.
                 If the longitude of the location is less than the longitude of the cenral
                 location, that means that we need to move left in the array. 
-                We change the sign to be negative
+                We change the sign to be negative.
             Case (2) + (3):
                 There's two cases here, where the signs are differing. 
                 To determine which line we're crossing, the absolute value of the difference
@@ -98,7 +100,7 @@ class GameState:
         if np.sign(self.center_coord[0]) == np.sign(lon): # Case 1
             if lon < self.center_coord:
                 horiz = -horiz
-        if math.fabs(self.cener_coord[0] - lon) < 180: # Case 2
+        if math.fabs(self.center_coord[0] - lon) < 180: # Case 2
             if self.center_coord[0] >= 0:
                 horiz = -horiz
         else if self.center_coord < 0: # Case 3
@@ -107,10 +109,7 @@ class GameState:
         horiz = math.floor(horiz / 1000 / gridsize)
         vert = math.floor(vert / 1000 / gridsize)
 
-        return radius + 1 + horiz, radius + 1 + vert
-
-
-
+        return np.add((radius + 1, radius + 1), (horiz, vert))
 
     def add_user(self, lat, lon):
         """ Adds a user and their starting location to the grid.
@@ -128,9 +127,13 @@ class GameState:
         else:
             return -1
 
-    # def update_user(self, id, lat, lon):
-    #     # update the user
-    #     self.grid[]
+    def update_user(self, id, lon, lat):
+        # update the user
+        gridloc = convert(lon, lat)
+        self.grid[gridloc[0]][gridloc[1]] = constants.Team.findTeam(id)
+        returngrid =  diff(grid, self.user_grid[id])
+        self.user_grid[id] = self.grid
+        return returngrid
 
     @staticmethod
     def diff(a, b):

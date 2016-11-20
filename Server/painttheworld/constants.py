@@ -13,6 +13,10 @@ class Team(Enum):
     RED  = 1
     BLUE = 2
 
+    @staticmethod
+    def findTeam(userid):
+        return 1 if userid < lobby_size/2 else 2
+
 # GPS-related constants
 class GPS:
     m1 = 111132.92  # latitude calculation term 1

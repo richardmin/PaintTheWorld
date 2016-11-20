@@ -79,6 +79,7 @@ class Lobby(Resource):
             resp['center-coord'] = active_game.center_coord
             resp['radius'] = constants.radius
             resp['gridsize'] = constants.gridsize
+            resp['meter-conversion-ratio'] = active_game.
         return resp
 
 # bind the APIs
