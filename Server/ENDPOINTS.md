@@ -10,11 +10,10 @@ Endpoints:
 
 3. join_lobby
     * No input/output keys. We use POST/GET to differentiate between joining the lobby and polling.
-    * POST sends a request to join the lobby, user-id (yours), as well as the remainder of the GET data 
+    * POST sends a request to join the lobby, user-id (yours), as well as the remainder of the GET data
+        * Input should be POST data with the fields lat and long 
     * GET should returns game_start_time in ISO 8601, if the game is starting. It will also have the central GPS location. 
     * Note if there is a game in progress, or the users are already maxed out we return an error in the format. What this effectively means is that you get user-id is -1 and not anything.
-    * To speed up development, we'll do our lobby joining process through a web-page.
-
 
 
 How to format data
