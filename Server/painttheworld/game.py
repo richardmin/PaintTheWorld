@@ -61,20 +61,35 @@ class GameState:
 
         """ Vectorizes the latitude. The degree ranges from -90 to 90.
             This latitude conversion doesn't handle poles.
+            I'm not sure how to handle you playing the game at the north and south pole.
         """ 
         if lat > self.center_coord[1]:
             vert = -vert
 
-        if self.center_coord[0] >= 0 and lon >= 0:
+        """ Vectorizes the longitude. The degree anges from -180 to 180.
+            There's three cases: 
+                1. They're both in the same hemisphere (east/west)
+                2. They cross over the 0 degree line
+                3. They cross over the 180 degree line
+            
+            Case (1):
+                If the longitude of the location is less than the longitude of the cenral
+                location, that means that we need to move left in the array. 
+                We change the sign to be negative
+            Case (2):
+                
+            Case (3):
+
+        """
+        if np.sign(self.center_coord[0]) == np.sign(lon):
             if lon < self.center_coord:
                 horiz = -horiz
         elif self.center_coord[0] < 0 and lon < 0:
             if lon < self.center_coord: 
                 horiz = -horiz
         elif self.center_coord[0] < 0 and lon > 0:
-            
         elif self.center_coord[0] > 0 and lon < 0:
-            
+            horiz = -horiz
                 
             
         vert = vert/self.gridsize + 25

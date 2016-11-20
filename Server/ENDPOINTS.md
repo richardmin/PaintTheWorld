@@ -7,6 +7,7 @@ Endpoints:
     * POST only, send GPS coordinates here, it returns grid deltas. 
         * Input Keys: user-id, lat, long. 
         * Please ensure that the lat and long degrees have no extra markings (i.e. they're just raw numbers. Do _NOT_ include °N, for example.)
+    
 
 3. join_lobby
     * No input/output keys. We use POST/GET to differentiate between joining the lobby and polling.

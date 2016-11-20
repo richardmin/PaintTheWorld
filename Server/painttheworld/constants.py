@@ -3,7 +3,7 @@ from enum import Enum
 # Game-related constants
 radius = 50    # 2500 tiles
 gridsize = 5   # 5 feet per tile
-lobby_size = 8
+lobby_size = 6
 #active_game = GameState(radius, gridsize)
 active_game = None
 
