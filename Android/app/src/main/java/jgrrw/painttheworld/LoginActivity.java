@@ -15,6 +15,7 @@ import com.android.volley.*;
 import com.android.volley.toolbox.*;
 import org.json.*;
 
+
 public class LoginActivity extends AppCompatActivity {
     Button b1;
     TextView tx1;
@@ -29,44 +30,18 @@ public class LoginActivity extends AppCompatActivity {
         tx1.setText("Hello, welcome to PaintTheWorld!");
     }
 
-    public void joinGame(View view) throws JSONException
-    {
-        RequestQueue queue = Volley.newRequestQueue(this);
-        String url ="http://our_url.com/join_lobby";
+    public void joinGame(View view) throws JSONException {
+        String UserLocationLat = Double.toString(34.070098);
+        String UserLocationLong = Double.toString(-118.440700); //Testing Inverted Fountain Coordinates
 
-        try {
-            final JSONObject jsonBody = new JSONObject("{\"lat\":\"37.014298129\", \"long\":\"50.0:w\"}");
-            // Request a string response from the provided URL.
-            JsonObjectRequest jsonRequest = new JsonObjectRequest(url, jsonBody,
-            new Response.Listener<JSONObject>() {
-
-                @Override
-                public void onResponse(JSONObject response) {
-                    // Do stuff here, successful request
-                    try {
-                        int UserID = response.getInt("user-id");
-                        if (UserID != -1) {
-                            Intent intent = new Intent(LoginActivity.this, MapsActivity.class);
-                            intent.putExtra(USER_ID, UserID);
-                            startActivity(intent);
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    // Unsuccessful request.
-                    tx1.setText("Join unsuccessful, please try again.");
-                }
-            });
-            // Add the request to the RequestQueue.
-            queue.add(jsonRequest);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        ConnectionTask task = new ConnectionTask();
+        String[] params = new String[2];
+        params[0] = UserLocationLat;
+        params[1] = UserLocationLong;
+        task.execute(params);
     }
+
+
 }
 
 
