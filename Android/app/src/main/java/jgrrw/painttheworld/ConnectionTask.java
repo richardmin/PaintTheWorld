@@ -72,6 +72,7 @@ public class ConnectionTask extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         //do what ever you want with the response
+
         Log.d("Result: ", result);
     }
 
