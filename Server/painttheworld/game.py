@@ -6,7 +6,16 @@ import numpy as np
 import datetime
 import math
 from painttheworld import constants
-from painttheworld.constants.GPS import m1, m2, m3, m4, p1, p2, p3
+# from painttheworld.constants.GPS import m1, m2, m3, m4, p1, p2, p3
+
+m1 = 111132.92  # latitude calculation term 1
+m2 = -559.82    # latitude calculation term 2
+m3 = 1.175      # latitude calculation term 3
+m4 = -0.0023    # latitude calculation term 4
+p1 = 111412.84  # longitude calculation term 1
+p2 = -93.5      # longitude calculation term 2
+p3 = 0.118      # longitude calculation term 3
+
 
 ''' Note that Latitude is North/South and Longitude is West/East'''
 class GameState:
@@ -38,6 +47,7 @@ class GameState:
         self.user_count = 0
         self.user_coords = []
         self.user_grid = []
+        self.user_grid.extend([self.grid for i in range(constants.lobby_size)])
 
     def start_game(self):
         """Initialize the starting position of the grid.
@@ -61,8 +71,8 @@ class GameState:
         """ Casts a GPS coordinate onto the grid, which has it's central
         locations defined by center_coord.
         """
-        vert = haversine(self.center_coord[0], self.center_coord[1], self.center_coord[0], lat) # longitude is east-west, we ensure that's the sam'
-        horiz = haversine(self.center_coord[0], self.center_coord[1], lon, self.center_coord[1])
+        vert = GameState.haversine(self.center_coord[0], self.center_coord[1], self.center_coord[0], lat) # longitude is east-west, we ensure that's the sam'
+        horiz = GameState.haversine(self.center_coord[0], self.center_coord[1], lon, self.center_coord[1])
 
         """ Vectorizes the latitude. The degree ranges from -90 to 90.
             This latitude conversion doesn't handle poles.
@@ -98,18 +108,20 @@ class GameState:
 
         """
         if np.sign(self.center_coord[0]) == np.sign(lon): # Case 1
-            if lon < self.center_coord:
+            if lon < self.center_coord[0]:
                 horiz = -horiz
         if math.fabs(self.center_coord[0] - lon) < 180: # Case 2
             if self.center_coord[0] >= 0:
                 horiz = -horiz
-        else if self.center_coord < 0: # Case 3
+        elif self.center_coord[0] < 0: # Case 3
             horiz = -horiz
             
-        horiz = math.floor(horiz / 1000 / gridsize)
-        vert = math.floor(vert / 1000 / gridsize)
+        horiz = math.floor(horiz / 1000 / constants.gridsize)
+        vert = math.floor(vert / 1000 / constants.gridsize)
 
-        return np.add((constants.radius + 1, constants.radius + 1), (horiz, vert))
+        print(horiz)
+        print(vert)
+        return np.add((self.radius + 1, self.radius + 1), (horiz, vert))
 
     def add_user(self, lat, lon):
         """ Adds a user and their starting location to the grid.
@@ -118,10 +130,10 @@ class GameState:
         locations.  If there are enough users to begin the game, it initializes
         the game variables. 
         """
-        if self.user_count < lobby_size:
+        if self.user_count < constants.lobby_size:
             self.user_count += 1
             self.user_coords.append((lat, lon))
-            if self.user_count == lobby_size:
+            if self.user_count == constants.lobby_size:
                 self.start_game()
             return self.user_count-1
         else:
@@ -139,8 +151,7 @@ class GameState:
         return returngrid, out_of_bounds
 
     def check_grid_range(self, coord):
-        return coord[0] >= 0                   and coord[1] >=0 
-           and coord[0] < constants.radius*2+1 and coord[1] < constants.radius*2+1
+        return coord[0] >= 0 and coord[1] >=0 and coord[0] < constants.radius*2+1 and coord[1] < constants.radius*2+1
          
     @staticmethod
     def diff(a, b):
@@ -168,13 +179,9 @@ class GameState:
         latitude = math.radians(coord[1])
         dict = {}
 
-        latlen = m1 + (m2 * math.cos(2 * latitude) +
-                      (m3 * math.cos(4 * latitude)) +
-                      (m4 * math.cos(6 * latitude)))
+        latlen = m1 + (m2 * math.cos(2 * latitude) + (m3 * math.cos(4 * latitude)) + (m4 * math.cos(6 * latitude)))
 
-        longlen = (p1 * math.cos(latitude)) +
-                  (p2 * math.cos(3 * latitude)) +
-                  (p3 * math.cos(5 * latitude))
+        longlen = (p1 * math.cos(latitude)) + (p2 * math.cos(3 * latitude)) + (p3 * math.cos(5 * latitude))
 
         dict['lat_meters'] = latlen
         dict['lat_feet'] = latlen * 3.28083333
