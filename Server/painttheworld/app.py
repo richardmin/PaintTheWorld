@@ -6,66 +6,81 @@
 __all__ = [ 'app' ]
 
 from flask import Flask, render_template, request
-from painttheworld.constants import active_game, radius, gridsize
+from flask_restful import reqparse, Resource, Api
+from painttheworld import constants
+from painttheworld.constants import active_game
 
 app = Flask(__name__)
 app.config.from_object('config')
-
-def validate_longitude(longitude):
-    return longitude >= -180 and longitude <= 180
-def validate_latitude(latitude):
-    return latitude >= -90 and latitude <= 90
+api = Api(app)
 
 @app.route('/debug')
 def debug():
     return render_template('debug.html')
 
-@app.route('/game_data', methods=['POST'])
-def game_data():
-    global active_game
-    if 'user-id' not in request.form.to_dict() or 'long' not in request.form.to_dict() or 'lat' not in request.form.to_dict():
-        return '{error: \'data format invalid\'}'
-    if active_game is None or active_game.start_time is None:
-        return '{error: \'No Game In Progress\'}'
-    if request.form['id'] < 0 or request.form['id'] >= game.lobby_size:
-        return '{error: \'Invalid user id\'}'
+def validate_coordinates(coord):
+    lon, lat = coord
+    return -180 <= lon <= 180 and -90 <= lat <= 90
 
-    if not validate_latitude(request.form['lat']):
-        return '{error: \'Invalid latitude degree\'}'
-    if not validate_longitude(request.form['long']):
-        return '{error: \'Invalid longitude degree\'}'
-    active_game.update_user(request.form['id'], request.form['long'], request.form['lat'])
+class GameData(Resource):
+    def __init__(self):
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument('user-id', type=int, location='form', required=True)
+        self.parser.add_argument('long', type=string, location='form', required=True)
+        self.parser.add_argument('lat', type=string, location='form', required=True)
 
+    def post(self):
+        args = self.parser.parse_args()
+        if active_game is None or active_game.start_time is None:
+            return {'error': 'No game in progress.'}, 400
+        elif args['user-id'] < 0 or args['user-id'] >= constants.lobby_size:
+            return {'error': 'Invalid user id.'}, 400
+        elif not validate_coordinates((args['long'], args['lat'])):
+            return {'error': 'Invalid coordinates.'}, 400
 
-    return '{{}}'
+        active_game.update_user(request.form['id'],
+                                request.form['long'],
+                                request.form['lat'])
+
+        return {}
 
 # TODO: Support multiple lobbies, probably in own file later
 # TODO: Make a game manager class that is in charge of cycling game state (a
 # game statemachine basically)
-@app.route('/join_lobby', methods=['GET', 'POST'])
-def join_lobby():
-    global active_game
-    if request.method == 'POST':
-        if 'lat' not in request.form.to_dict():
-            return '{error: \'lat field not found\'}'
-        if 'long' not in request.form.to_dict(): 
-            return '{error: \'long field not found\'}'
-        if not validate_latitude(request.form['lat']):
-            return '{error: \'Invalid latitude degree\'}'
-        if not validate_longitude(request.form['long']):
-            return '{error: \'Invalid longitude degree\'}'
+class Lobby(Resource):
+    def __init__(self):
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument('lat', type=int, location='form', required=True)
+        self.parser.add_argument('long', type=int, location='form', required=True)
+
+    def post(self):
+        args = self.parser.parse()
+        if not validate_coordinates((args['long'], args['lat'])):
+            return {'error': 'Invalid coordinates'}, 400
         if active_game is None:
-            active_game = GameState(radius, gridsize)
-         
+            active_game = GameState(constants.radius, constants.gridsize)
         usernum = active_game.add_user(request.form['lat'], request.form['long'])
-        
-        if active_game.user_count is game.lobby_size:
-            return '{{user-id: {0}, user-count: {1}, game_start_time: {2}}}'.format(usernum, active_game.user_count, active_game.start_time.isoformat())
-        else:
-            return '{{user-id: {0}, user-count: {1}}}'.format(usernum, active_game.user_count)
-        
-    if active_game is None:
-        return '{error: \'No game in progress\'}'
-    elif active_game.user_count < game.lobby_size:
-        return '{{user-count: {0}}}'.format(active_game.user_count)
-    return '{{user-count: {0}, game_start_time: {1}}}'.format(active_game.user_count, active_game.start_time.isoformat())
+
+        resp = {
+            'user-id': usernum,
+            'user-count': constants.lobby_size
+        }
+        if active_game.user_count is constants.lobby_size:
+            resp['game-start-time'] = active_game.start_time.isoformat()
+        return resp
+
+    def get(self):
+        if active_game is None:
+            return {'error': 'No game in progress.'}, 400
+
+        resp = {
+            'user-count': active_game.user_count
+        }
+        if active_game.user_count == game.lobby_size:
+            resp['game-start-time'] = active_game.start_time.isoformat()
+
+        return resp
+
+# bind the APIs
+api.add_resource(GameData, '/game_data')
+api.add_resource(Lobby, '/join_lobby')
