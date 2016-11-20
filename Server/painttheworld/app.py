@@ -21,6 +21,7 @@ def debug():
 
 @app.route('/reset')
 def reset():
+    global active_game
     active_game = None
     
 def validate_coordinates(coord):
