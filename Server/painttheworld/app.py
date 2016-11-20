@@ -27,8 +27,8 @@ class GameData(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('user-id', type=int, location='form', required=True)
-        self.parser.add_argument('long', type=string, location='form', required=True)
-        self.parser.add_argument('lat', type=string, location='form', required=True)
+        self.parser.add_argument('long', type=float, location='form', required=True)
+        self.parser.add_argument('lat', type=float, location='form', required=True)
 
     def post(self):
         args = self.parser.parse_args()

@@ -128,12 +128,12 @@ class GameState:
         latitude = math.radians(coord[1])
         dict = {}
 
-        latlen = m1 + (m2 * math.cos(2 * latitude) +
-                      (m3 * math.cos(4 * latitude)) +
+        latlen = m1 + (m2 * math.cos(2 * latitude) +   \
+                      (m3 * math.cos(4 * latitude)) +  \
                       (m4 * math.cos(6 * latitude)))
 
-        longlen = (p1 * math.cos(latitude)) +
-                  (p2 * math.cos(3 * latitude)) +
+        longlen = (p1 * math.cos(latitude)) +          \
+                  (p2 * math.cos(3 * latitude)) +      \
                   (p3 * math.cos(5 * latitude))
 
         dict['lat_meters'] = latlen
