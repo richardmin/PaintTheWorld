@@ -6,27 +6,9 @@ import numpy as np
 import datetime
 # from math import radians, cos, sin, asin, sqrt
 import math
-
-# Teams
-NONE = 0
-RED = 1
-BLUE = 2
-
-
-# Set up "Constants"
-m1 = 111132.92      # latitude calculation term 1
-m2 = -559.82        # latitude calculation term 2
-m3 = 1.175          # latitude calculation term 3
-m4 = -0.0023        # latitude calculation term 4
-p1 = 111412.84      # longitude calculation term 1
-p2 = -93.5          # longitude calculation term 2
-p3 = 0.118          # longitude calculation term 3
-
-lobby_size = 8
-
+from painttheworld.constants.GPS import m1, m2, m3, m4, p1, p2, p3
 
 ''' Note that Latitude is North/South and Longitude is West/East'''
-
 class GameState:
     """Keeps track of which teams have colored which areas of the map.
 
@@ -78,22 +60,20 @@ class GameState:
         horiz = haversine(self.center_coord[0], self.center_coord[1], lon, self.center_coord[1])
 
         """ Vectorizes the latitude. The degree ranges from -90 to 90.
-        If the latitude is positive, this means we're in the northern hemisphere.
-            If the latitude is above the center coodinate, we want to move up our array tiles, so we make it negative.
-        If the latitude is negative, this means we're in the souther hemisphere.
-            If the latitude is above the center coordinate, we want to 
+            This latitude conversion doesn't handle poles.
         """ 
         if lat > self.center_coord[1]:
             vert = -vert
 
         if self.center_coord[0] >= 0 and lon >= 0:
             if lon < self.center_coord:
-                
+                horiz = -horiz
         elif self.center_coord[0] < 0 and lon < 0:
-            
+            if lon < self.center_coord: 
+                horiz = -horiz
         elif self.center_coord[0] < 0 and lon > 0:
             
-        else:
+        elif self.center_coord[0] > 0 and lon < 0:
             
                 
             
@@ -101,12 +81,7 @@ class GameState:
         horiz = horiz/self.gridsize + 25
 
         return vert, horiz
-
     
-     
-        
-        
-
     def add_user(self, lat, lon):
         """ Adds a user and their starting location to the grid.
             Returns the user id number assosciated with that user, as well as their locations.
