@@ -39,9 +39,10 @@ class GameData(Resource):
         elif not validate_coordinates((args['long'], args['lat'])):
             return {'error': 'Invalid coordinates.'}, 400
 
-        active_game.update_user(request.form['id'],
-                                request.form['long'],
-                                request.form['lat'])
+        returngrid, out_of_bounds = active_game.update_user(request.form['id'],
+                                             request.form['long'],
+                                             request.form['lat'])
+                        
 
         return {}
 
@@ -76,10 +77,9 @@ class Lobby(Resource):
         }
         if active_game.user_count == game.lobby_size:
             resp['game-start-time'] = active_game.start_time.isoformat()
-            resp['center-coord'] = active_game.center_coord
+            resp['center-coord'] = active_game.center_coord.conversion_rates['lat_meters'] * constants.gridsize
             resp['radius'] = constants.radius
             resp['gridsize'] = constants.gridsize
-            resp['meter-conversion-ratio'] = active_game.
         return resp
 
 # bind the APIs
