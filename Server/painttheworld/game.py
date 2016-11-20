@@ -76,13 +76,34 @@ class GameState:
         """
         vert = haversine(self.center_coord[0], self.center_coord[1], self.center_coord[0], lat) # longitude is east-west, we ensure that's the sam'
         horiz = haversine(self.center_coord[0], self.center_coord[1], lon, self.center_coord[1])
+
+        """ Vectorizes the latitude. The degree ranges from -90 to 90.
+        If the latitude is positive, this means we're in the northern hemisphere.
+            If the latitude is above the center coodinate, we want to move up our array tiles, so we make it negative.
+        If the latitude is negative, this means we're in the souther hemisphere.
+            If the latitude is above the center coordinate, we want to 
+        """ 
+        if lat > self.center_coord[1]:
+            vert = -vert
+
+        if self.center_coord[0] >= 0 and lon >= 0:
+            if lon < self.center_coord:
+                
+        elif self.center_coord[0] < 0 and lon < 0:
+            
+        elif self.center_coord[0] < 0 and lon > 0:
+            
+        else:
+            
+                
+            
         vert = vert/self.gridsize + 25
         horiz = horiz/self.gridsize + 25
 
         return vert, horiz
 
     
-    # def 
+     
         
         
 
