@@ -31,7 +31,6 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="INSERT API KEY" />
-
         <activity
             android:name=".MapsActivity"
             android:screenOrientation="portrait"
@@ -39,7 +38,8 @@
         </activity>
         <activity
             android:name=".LoginActivity"
-            android:label="loginAct">
+            android:label="Login"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
