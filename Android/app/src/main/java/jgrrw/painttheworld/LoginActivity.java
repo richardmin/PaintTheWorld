@@ -1,19 +1,13 @@
 package jgrrw.painttheworld;
 
-import android.*;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import android.app.Activity;
-import android.graphics.Color;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import java.util.Map;
-import java.util.HashMap;
 
 import android.widget.Button;
 import android.widget.TextView;
@@ -91,49 +85,11 @@ public class LoginActivity extends AppCompatActivity implements
 
     public void joinGame(View view) throws JSONException
     {
-        RequestQueue queue = Volley.newRequestQueue(this);
-        String url ="http://ec2-54-153-39-233.us-west-1.compute.amazonaws.com/join_lobby";
-        Map<String, String> jsonParams = new HashMap<String, String>();
-
-        jsonParams.put("lat", String.valueOf(mLocation.getLatitude()));
-        jsonParams.put("long", String.valueOf(mLocation.getLongitude()));
-
-        JsonObjectRequest postRequest = new JsonObjectRequest( Request.Method.POST, url,
-
-                new JSONObject(jsonParams),
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Integer UserID = 0;
-                        try {
-                            UserID = response.getInt("user-id");
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        tx1.setText("Joining game: Welcome User " + UserID.toString());
-                        if (UserID != -1) {
-                            Intent intent = new Intent(LoginActivity.this, MapsActivity.class);
-                            intent.putExtra(USER_ID, UserID);
-                            //poll until game is ready to start
-                            startActivity(intent);
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        tx1.setText("Post unsuccessful, please try again.");
-                    }
-                }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Content-Type", "application/json; charset=utf-8");
-                headers.put("User-agent", System.getProperty("http.agent"));
-                return headers;
-            }
-        };
-        queue.add(postRequest);
+        JConnectionTask task = new ConnectionTask();
+        String[] params = new String[2];
+        params[0] = String.valueOf(mLocation.getLatitude());
+        params[1] = String.valueOf(mLocation.getLongitude());
+        task.execute(params);
     }
 
     //Methods for connecting to Google Play Services API
