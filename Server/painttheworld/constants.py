@@ -2,8 +2,8 @@ from enum import Enum
 
 # Game-related constants
 radius = 50    # 2500 tiles
-gridsize = 5   # 5 feet per tile
-lobby_size = 8
+gridsize = 5   # 5 meters per tile
+lobby_size = 6
 active_game = None
 #active_game = GameState(radius, gridsize)
 
@@ -21,3 +21,7 @@ class Team(Enum):
     NONE = 0
     RED  = 1
     BLUE = 2
+
+    @staticmethod
+    def findTeam(userid):
+        return 1 if userid < lobby_size/2 else 2
