@@ -84,15 +84,15 @@ class GameState:
             Case (3):
 
         """
-        if np.sign(self.center_coord[0]) == np.sign(lon):
-            if lon < self.center_coord:
-                horiz = -horiz
-        elif self.center_coord[0] < 0 and lon < 0:
-            if lon < self.center_coord: 
-                horiz = -horiz
-        elif self.center_coord[0] < 0 and lon > 0:
-        elif self.center_coord[0] > 0 and lon < 0:
-            horiz = -horiz
+        #if np.sign(self.center_coord[0]) == np.sign(lon):
+        #    if lon < self.center_coord:
+        #        horiz = -horiz
+        #elif self.center_coord[0] < 0 and lon < 0:
+        #    if lon < self.center_coord: 
+        #        horiz = -horiz
+        #elif self.center_coord[0] < 0 and lon > 0:
+        #elif self.center_coord[0] > 0 and lon < 0:
+        #    horiz = -horiz
 
             
     def add_user(self, lat, lon):
