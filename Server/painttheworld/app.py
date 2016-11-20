@@ -9,6 +9,7 @@ from flask import Flask, render_template, request
 from flask_restful import reqparse, Resource, Api
 from painttheworld import constants
 from painttheworld.constants import active_game
+from painttheworld.game import GameState
 
 app = Flask(__name__)
 app.config.from_object('config')

@@ -44,7 +44,7 @@ class GameState:
             This calculates the center coordinate by average the longitudes and latitudes of all people. (this might not work too well, as that's not really how nautical miles work')
             Additionally, it sets the start time to be 3 seconds from now"""
         length = len(self.lat)
-        self.center_coord = sum(self.lat)/length, sum(self.lon)/length
+        self.center_coord = sum(self.lon)/length, sum(self.lat)/length
         self.longitude_conversion = self.calculateLongitude(self.center_coord)
         self.start_time = (datetime.datetime.now() + datetime.timedelta(seconds = 3))
 
@@ -53,11 +53,16 @@ class GameState:
         x, y = coord
         self.grid[x][y] = team
 
-    def convert(self, coord):
+    def convert(self, lon, lat):
         """ Casts a GPS coordinate onto the grid, which has it's central locations defined by center_coord
         """
-        lon, lat = coord
+        vert = haversine(self.center_coord[0], self.center_coord[1], self.center_coord[0], lat) # longitude is east-west, we ensure that's the sam'
+        horiz = haversine(self.center_coord[0], self.center_coord[1], lon, self.center_coord[1])
+        vert = vert/self.gridsize + 25
+        horiz = horiz/self.gridsize + 25
 
+        return vert, horiz
+    
     def add_user(self, lat, lon):
         """ Adds a user and their starting location to the grid.
             Returns the user id number assosciated with that user, as well as their locations.
@@ -67,15 +72,15 @@ class GameState:
             self.user_count += 1
             self.lat.append(float(lat))
             self.lon.append(float(lon))
-             
             if self.user_count == lobby_size:
                 self.initialize_game()
             return self.user_count-1
         else:
             return -1
 
-    #def update_user(self, id, lat, lon):
-    #   if id < 0 or id >= lobby_size
+    # def update_user(self, id, lat, lon):
+    #     # update the user
+    #     self.grid[]
 
     @staticmethod
     def diff(a, b):
@@ -91,9 +96,11 @@ class GameState:
         return list(zip(coord, val))
 
     @staticmethod
-    def calculateLongitude(coord):
+    def conversion_rates(coord):
         """Calculates the conversion rate for 1 degree of longitude to a variety of measurements, returned in a dict. 
-
+            
+        Args: 
+            coord: a tuple (longitude, latitude) 
         Returns:
             Conversion rate for 1 degree of longitude to miles
         """
@@ -121,11 +128,11 @@ class GameState:
         Source code from: http://stackoverflow.com/questions/15736995/how-can-i-quickly-estimate-the-distance-between-two-latitude-longitude-points
         """
         # convert decimal degrees to radians
-        lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+        lon1, lat1, lon2, lat2 = map(math.radians, [lon1, lat1, lon2, lat2])
         # haversine formula
         dlon = lon2 - lon1
         dlat = lat2 - lat1
-        a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
-        c = 2 * asin(sqrt(a))
+        a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2)**2
+        c = 2 * math.asin(math.sqrt(a))
         km = 6367 * c
         return km
