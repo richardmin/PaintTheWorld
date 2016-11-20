@@ -62,6 +62,23 @@ class GameState:
         """
         vert = haversine(self.center_coord[0], self.center_coord[1], self.center_coord[0], lat) # longitude is east-west, we ensure that's the sam'
         horiz = haversine(self.center_coord[0], self.center_coord[1], lon, self.center_coord[1])
+
+        """ Vectorizes the latitude. The degree ranges from -90 to 90.
+            This latitude conversion doesn't handle poles.
+        """
+        #if lat > self.center_coord[1]:
+        #    vert = -vert
+
+        #if self.center_coord[0] >= 0 and lon >= 0:
+        #    if lon < self.center_coord:
+        #        horiz = -horiz
+        #elif self.center_coord[0] < 0 and lon < 0:
+        #    if lon < self.center_coord:
+        #        horiz = -horiz
+        #elif self.center_coord[0] < 0 and lon > 0:
+        #
+        #elif self.center_coord[0] > 0 and lon < 0:
+
         vert = vert/self.gridsize + 25
         horiz = horiz/self.gridsize + 25
 
