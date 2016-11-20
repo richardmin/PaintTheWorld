@@ -19,6 +19,10 @@ api = Api(app)
 def debug():
     return render_template('debug.html')
 
+@app.route('/reset')
+def reset():
+    active_game = None
+    
 def validate_coordinates(coord):
     lon, lat = coord
     return -180 <= lon <= 180 and -90 <= lat <= 90
@@ -27,8 +31,8 @@ class GameData(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('user-id', type=int, location='form', required=True)
-        self.parser.add_argument('long', type=string, location='form', required=True)
-        self.parser.add_argument('lat', type=string, location='form', required=True)
+        self.parser.add_argument('long', type=float, location='form', required=True)
+        self.parser.add_argument('lat', type=float, location='form', required=True)
 
     def post(self):
         args = self.parser.parse_args()
@@ -51,11 +55,12 @@ class GameData(Resource):
 class Lobby(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('lat', type=int, location='form', required=True)
-        self.parser.add_argument('long', type=int, location='form', required=True)
+        self.parser.add_argument('lat', type=float, location='form', required=True)
+        self.parser.add_argument('long', type=float, location='form', required=True)
 
     def post(self):
-        args = self.parser.parse()
+        global active_game
+        args = self.parser.parse_args()
         if not validate_coordinates((args['long'], args['lat'])):
             return {'error': 'Invalid coordinates'}, 400
         if active_game is None:
@@ -64,7 +69,7 @@ class Lobby(Resource):
         usernum = active_game.add_user(request.form['lat'], request.form['long'])
         return {
             'user-id': usernum,
-            'user-count': constants.lobby_size
+            'user-count': active_game.user_count
         }
 
     def get(self):
@@ -74,7 +79,7 @@ class Lobby(Resource):
         resp = {
             'user-count': active_game.user_count
         }
-        if active_game.user_count == game.lobby_size:
+        if active_game.user_count == constants.lobby_size:
             resp['game-start-time'] = active_game.start_time.isoformat()
             resp['center-coord'] = active_game.center_coord
             resp['radius'] = constants.radius
@@ -84,3 +89,4 @@ class Lobby(Resource):
 # bind the APIs
 api.add_resource(GameData, '/game_data')
 api.add_resource(Lobby, '/join_lobby')
+

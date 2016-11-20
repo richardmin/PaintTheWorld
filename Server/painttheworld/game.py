@@ -4,9 +4,9 @@
 
 import numpy as np
 import datetime
-# from math import radians, cos, sin, asin, sqrt
 import math
-from painttheworld.constants.GPS import m1, m2, m3, m4, p1, p2, p3
+from painttheworld import constants
+from painttheworld.constants import m1, m2, m3, m4, p1, p2, p3
 
 ''' Note that Latitude is North/South and Longitude is West/East'''
 class GameState:
@@ -46,7 +46,6 @@ class GameState:
         really how nautical miles work). Additionally, it sets the start time to
         be 3 seconds from now.
         """
-        length = len(self.user_coords)
         self.center_coord = np.mean(self.user_coords, axis=1)
         self.longitude_conversion = self.calculateLongitude(self.center_coord)
         self.start_time = (datetime.datetime.now() + datetime.timedelta(seconds=3))
@@ -103,10 +102,10 @@ class GameState:
         locations.  If there are enough users to begin the game, it initializes
         the game variables. 
         """
-        if self.user_count < lobby_size:
+        if self.user_count < constants.lobby_size:
             self.user_count += 1
             self.user_coords.append((lat, lon))
-            if self.user_count == lobby_size:
+            if self.user_count == constants.lobby_size:
                 self.start_game()
             return self.user_count-1
         else:
@@ -142,12 +141,12 @@ class GameState:
         latitude = math.radians(coord[1])
         dict = {}
 
-        latlen = m1 + (m2 * math.cos(2 * latitude) +
-                      (m3 * math.cos(4 * latitude)) +
+        latlen = m1 + (m2 * math.cos(2 * latitude) +   \
+                      (m3 * math.cos(4 * latitude)) +  \
                       (m4 * math.cos(6 * latitude)))
 
-        longlen = (p1 * math.cos(latitude)) +
-                  (p2 * math.cos(3 * latitude)) +
+        longlen = (p1 * math.cos(latitude)) +          \
+                  (p2 * math.cos(3 * latitude)) +      \
                   (p3 * math.cos(5 * latitude))
 
         dict['lat_meters'] = latlen
