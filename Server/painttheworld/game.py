@@ -49,7 +49,7 @@ class GameState:
         """
         length = len(self.user_coords)
         self.center_coord = np.mean(self.user_coords, axis=1)
-        self.conversion_ratesn = self.conversion_rates(self.center_coord)
+        self.conversion_rates = self.conversion_rates(self.center_coord)
         self.start_time = (datetime.datetime.now() + datetime.timedelta(seconds=3))
 
     def update(self, coord, team):
@@ -57,7 +57,7 @@ class GameState:
         x, y = coord
         self.grid[x][y] = team
 
-    def convert(self, lon, lat):
+    def project(self, lon, lat):
         """ Casts a GPS coordinate onto the grid, which has it's central
         locations defined by center_coord.
         """
@@ -109,7 +109,7 @@ class GameState:
         horiz = math.floor(horiz / 1000 / gridsize)
         vert = math.floor(vert / 1000 / gridsize)
 
-        return np.add((radius + 1, radius + 1), (horiz, vert))
+        return np.add((constants.radius + 1, constants.radius + 1), (horiz, vert))
 
     def add_user(self, lat, lon):
         """ Adds a user and their starting location to the grid.
@@ -128,13 +128,19 @@ class GameState:
             return -1
 
     def update_user(self, id, lon, lat):
-        # update the user
-        gridloc = convert(lon, lat)
-        self.grid[gridloc[0]][gridloc[1]] = constants.Team.findTeam(id)
+        gridloc = project(lon, lat)
+        out_of_bounds = gridloc[0] is out of range or gridloc[1] is out of range
+        
+        if not out_of_bounds:
+            self.grid[gridloc[0]][gridloc[1]] = constants.Team.findTeam(id)
+
         returngrid =  diff(grid, self.user_grid[id])
         self.user_grid[id] = self.grid
-        return returngrid
+        return returngrid, out_of_bounds
 
+    def check_grid_range(self, x, y):
+        return x >= 0 and y >=0 and x < constants.radius*2+1 and y < constants.radius*2+1
+         
     @staticmethod
     def diff(a, b):
         """Calculate the deltas of two GameState objects.

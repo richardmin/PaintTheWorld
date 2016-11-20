@@ -75,11 +75,11 @@ class Lobby(Resource):
         resp = {
             'user-count': active_game.user_count
         }
-        if active_game.user_count == game.lobby_size:
+        if active_game.user_count == constants.lobby_size:
             resp['game-start-time'] = active_game.start_time.isoformat()
-            resp['center-coord'] = active_game.center_coord.conversion_rates['lat_meters'] * constants.gridsize
+            resp['center-coord'] = active_game.center_coord
             resp['radius'] = constants.radius
-            resp['gridsize'] = constants.gridsize
+            resp['gridsize'] = active_game.conversion_rates['lat_meters'] * constants.gridsize
         return resp
 
 # bind the APIs
