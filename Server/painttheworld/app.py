@@ -80,12 +80,15 @@ class Lobby(Resource):
         }
         if active_game.user_count == constants.lobby_size:
             resp['game-start-time'] = active_game.start_time.isoformat()
-            resp['center-coord'] = active_game.center_coord.conversion_rates['lat_meters'] * constants.gridsize
+            resp['center-coord'] = active_game.center_coord
             resp['radius'] = constants.radius
-            resp['gridsize'] = constants.gridsize
+            resp['g=ridsize'] = active_game.conversion_rates['lat_meters'] * constants.gridsize
         return resp
 
 # bind the APIs
 api.add_resource(GameData, '/game_data')
 api.add_resource(Lobby, '/join_lobby')
+<<<<<<< HEAD
 
+=======
+>>>>>>> game

@@ -38,6 +38,7 @@ class GameState:
         self.user_count = 0
         self.user_coords = []
         self.user_grid = []
+        self.user_grid.extend([self.grid for i in range(constants.lobby_size)])
 
     def start_game(self):
         """Initialize the starting position of the grid.
@@ -56,12 +57,12 @@ class GameState:
         x, y = coord
         self.grid[x][y] = team
 
-    def convert(self, lon, lat):
+    def project(self, lon, lat):
         """ Casts a GPS coordinate onto the grid, which has it's central
         locations defined by center_coord.
         """
-        vert = haversine(self.center_coord[0], self.center_coord[1], self.center_coord[0], lat) # longitude is east-west, we ensure that's the sam'
-        horiz = haversine(self.center_coord[0], self.center_coord[1], lon, self.center_coord[1])
+        vert = GameState.haversine(self.center_coord[0], self.center_coord[1], self.center_coord[0], lat) # longitude is east-west, we ensure that's the sam'
+        horiz = GameState.haversine(self.center_coord[0], self.center_coord[1], lon, self.center_coord[1])
 
         """ Vectorizes the latitude. The degree ranges from -90 to 90.
             This latitude conversion doesn't handle poles.
@@ -97,18 +98,18 @@ class GameState:
 
         """
         if np.sign(self.center_coord[0]) == np.sign(lon): # Case 1
-            if lon < self.center_coord:
+            if lon > self.center_coord[0]:
                 horiz = -horiz
         if math.fabs(self.center_coord[0] - lon) < 180: # Case 2
             if self.center_coord[0] >= 0:
                 horiz = -horiz
-        else if self.center_coord < 0: # Case 3
+        elif self.center_coord[0] < 0: # Case 3
             horiz = -horiz
-            
-        horiz = math.floor(horiz / 1000 / gridsize)
-        vert = math.floor(vert / 1000 / gridsize)
 
-        return np.add((radius + 1, radius + 1), (horiz, vert))
+        horiz = math.floor(horiz * 1000 / constants.gridsize)
+        vert = math.floor(vert * 1000 / constants.gridsize)
+
+        return np.add((self.radius + 1, self.radius + 1), (horiz, vert))
 
     def add_user(self, lat, lon):
         """ Adds a user and their starting location to the grid.
@@ -127,13 +128,19 @@ class GameState:
             return -1
 
     def update_user(self, id, lon, lat):
-        # update the user
-        gridloc = convert(lon, lat)
-        self.grid[gridloc[0]][gridloc[1]] = constants.Team.findTeam(id)
+        gridloc = project(lon, lat)
+        out_of_bounds = check_grid_range(gridloc[0], gridloc[1])
+        
+        if not out_of_bounds:
+            self.grid[gridloc[0]][gridloc[1]] = constants.Team.findTeam(id)
+
         returngrid =  diff(grid, self.user_grid[id])
         self.user_grid[id] = self.grid
-        return returngrid
+        return returngrid, out_of_bounds
 
+    def check_grid_range(self, coord):
+        return coord[0] >= 0 and coord[1] >=0 and coord[0] < constants.radius*2+1 and coord[1] < constants.radius*2+1
+         
     @staticmethod
     def diff(a, b):
         """Calculate the deltas of two GameState objects.
@@ -160,13 +167,9 @@ class GameState:
         latitude = math.radians(coord[1])
         dict = {}
 
-        latlen = m1 + (m2 * math.cos(2 * latitude) +   \
-                      (m3 * math.cos(4 * latitude)) +  \
-                      (m4 * math.cos(6 * latitude)))
+        latlen = m1 + (m2 * math.cos(2 * latitude) + (m3 * math.cos(4 * latitude)) + (m4 * math.cos(6 * latitude)))
 
-        longlen = (p1 * math.cos(latitude)) +          \
-                  (p2 * math.cos(3 * latitude)) +      \
-                  (p3 * math.cos(5 * latitude))
+        longlen = (p1 * math.cos(latitude)) + (p2 * math.cos(3 * latitude)) + (p3 * math.cos(5 * latitude))
 
         dict['lat_meters'] = latlen
         dict['lat_feet'] = latlen * 3.28083333
