@@ -15,9 +15,6 @@ app = Flask(__name__)
 app.config.from_object('config')
 api = Api(app)
 
-@app.route('/debug')
-def debug():
-    return render_template('debug.html')
 
 @app.route('/reset')
 def reset():
