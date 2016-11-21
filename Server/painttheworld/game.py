@@ -7,6 +7,7 @@ import datetime
 import math
 from painttheworld import constants
 from painttheworld.constants import m1, m2, m3, m4, p1, p2, p3
+from painttheworld.coordnates import haversine, conversion_rates
 
 ''' Note that Latitude is North/South and Longitude is West/East'''
 class GameState:
@@ -49,7 +50,7 @@ class GameState:
         be 3 seconds from now.
         """
         self.center_coord = np.mean(self.user_coords, axis=1)
-        self.conversion_rates = self.conversion_rates(self.center_coord)
+        self.conversion_rates = conversion_rates(self.center_coord)
         self.start_time = (datetime.datetime.now() + datetime.timedelta(seconds=3))
 
     def update(self, coord, team):
@@ -61,8 +62,8 @@ class GameState:
         """ Casts a GPS coordinate onto the grid, which has it's central
         locations defined by center_coord.
         """
-        vert = GameState.haversine(self.center_coord[0], self.center_coord[1], self.center_coord[0], lat) # longitude is east-west, we ensure that's the sam'
-        horiz = GameState.haversine(self.center_coord[0], self.center_coord[1], lon, self.center_coord[1])
+        vert = haversine(self.center_coord, (self.center_coord[0], lat)) # longitude is east-west, we ensure that's the sam'
+        horiz = haversine(self.center_coord, (lon, self.center_coord[1]))
 
         """ Vectorizes the latitude. The degree ranges from -90 to 90.
             This latitude conversion doesn't handle poles.
@@ -132,7 +133,7 @@ class GameState:
         out_of_bounds = check_grid_range(gridloc[0], gridloc[1])
         
         if not out_of_bounds:
-            self.grid[gridloc[0]][gridloc[1]] = constants.Team.findTeam(id)
+            self.grid[gridloc] = constants.Team.findTeam(id)
 
         returngrid =  diff(grid, self.user_grid[id])
         self.user_grid[id] = self.grid
@@ -153,52 +154,3 @@ class GameState:
         val = diff[coord]
         coord = map(tuple, np.transpose(coord))  # turn coord into (x,y) tuples
         return list(zip(coord, val))
-
-    @staticmethod
-    def conversion_rates(coord):
-        """Calculates the conversion rate for 1 degree of longitude to a variety
-        of measurements, returned in a dict. 
-            
-        Args: 
-            coord: a tuple (longitude, latitude) 
-        Returns:
-            Conversion rate for 1 degree of longitude to miles
-        """
-        latitude = math.radians(coord[1])
-        dict = {}
-
-        latlen = m1 + ( m2 * math.cos(2 * latitude) + \
-                        m3 * math.cos(4 * latitude) + \
-                        m4 * math.cos(6 * latitude)   \
-                      )
-
-        longlen = (p1 * math.cos(1 * latitude)) + \
-                  (p2 * math.cos(3 * latitude)) + \ 
-                  (p3 * math.cos(5 * latitude))
-
-        dict['lat_meters'] = latlen
-        dict['lat_feet'] = latlen * 3.28083333
-        dict['lat_miles'] = dict['lat_feet'] / 5280
-        
-        dict['long_meters'] = longlen
-        dict['long_feet'] = longlen * 3.28083333
-        dict['long_miles'] = dict['long_feet'] / 5280
-
-        return dict
-
-    @staticmethod
-    def haversine(lon1, lat1, lon2, lat2):
-        """
-        Calculate the great circle distance between two points
-        on the earth (specified in decimal degrees)
-        Source code from: http://stackoverflow.com/questions/15736995/how-can-i-quickly-estimate-the-distance-between-two-latitude-longitude-points
-        """
-        # convert decimal degrees to radians
-        lon1, lat1, lon2, lat2 = map(math.radians, [lon1, lat1, lon2, lat2])
-        # haversine formula
-        dlon = lon2 - lon1
-        dlat = lat2 - lat1
-        a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2)**2
-        c = 2 * math.asin(math.sqrt(a))
-        km = 6367 * c
-        return km
