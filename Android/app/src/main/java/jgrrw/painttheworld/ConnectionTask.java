@@ -3,6 +3,9 @@ package jgrrw.painttheworld;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -16,7 +19,15 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 public class ConnectionTask extends AsyncTask<String, Void, String> {
+    public interface AsyncResponse {
+        void processFinish(JSONObject output);
+    }
+    public AsyncResponse delegate = null;
 
+    public ConnectionTask(AsyncResponse delegate){
+        this.delegate = delegate;
+    }
+    JSONObject json;
 
     @Override
     protected String doInBackground(String... params) {
@@ -72,7 +83,18 @@ public class ConnectionTask extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         //do what ever you want with the response
+        try {
+            json = new JSONObject(result);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        if ( result != "" )
+            delegate.processFinish(json);
+        else
+            Log.d("ERROR IN ASYNCTASK: ", "");
         Log.d("Result: ", result);
+
     }
 
 }

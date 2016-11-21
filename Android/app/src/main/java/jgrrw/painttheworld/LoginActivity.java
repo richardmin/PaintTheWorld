@@ -22,12 +22,15 @@ import com.google.android.gms.location.LocationServices;
 
 import org.json.*;
 
+
 public class LoginActivity extends AppCompatActivity implements
+        ConnectionTask.AsyncResponse,
         com.google.android.gms.location.LocationListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener{
     Button b1;
     TextView tx1;
+    Intent intent;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest locationRequest;
     private LocationListener locationListener;
@@ -86,11 +89,30 @@ public class LoginActivity extends AppCompatActivity implements
 
     public void joinGame(View view) throws JSONException
     {
-        ConnectionTask task = new ConnectionTask();
+        ConnectionTask task = new ConnectionTask(this);
         String[] params = new String[2];
         params[0] = String.valueOf(mLocation.getLatitude());
         params[1] = String.valueOf(mLocation.getLongitude());
         task.execute(params);
+    }
+
+    @Override
+    public void processFinish(JSONObject output) {
+        //Here you will receive the result fired from async class
+        //of onPostExecute(result) method.
+        Log.d("Output: ", output.toString());
+        intent = new Intent(this, MapsActivity.class);
+        try {
+            Integer USER_ID = output.getInt("user-id");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        if (USER_ID != null)
+            intent.putExtra("USER_ID", USER_ID);
+        else
+            Log.d("ERROR BLANK USER", "");
+
     }
 
     //Methods for connecting to Google Play Services API
