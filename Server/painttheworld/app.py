@@ -83,7 +83,7 @@ class Lobby(Resource):
             resp['game-start-time'] = active_game.start_time.isoformat()
             resp['center-coord'] = active_game.center_coord
             resp['radius'] = constants.radius
-            resp['g=ridsize'] = active_game.conversion_rates['lat_meters'] * constants.gridsize
+            resp['gridsize'] = active_game.conversion_rates['lat_meters'] * constants.gridsize
         return resp
 
 # bind the APIs

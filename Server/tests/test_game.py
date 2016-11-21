@@ -1,6 +1,6 @@
 import pytest
 from painttheworld.game import GameState
-from painttheworld.constants import RED, BLUE
+from painttheworld.constants import Team
 from painttheworld import constants
 
 
@@ -13,9 +13,9 @@ test_coords = [(x,y) for x in range(size) for y in range(size)]
 def test_gamestate_diff(coordinate):
     gs1 = GameState(size, constants.gridsize)
     gs2 = GameState(size, constants.gridsize)
-    gs2.update(coordinate, RED)
+    gs2.update(coordinate, Team.RED)
     diff = GameState.diff(gs1, gs2)
-    assert diff == [(coordinate, RED)]
+    assert diff == [(coordinate, Team.RED)]
 
 @pytest.mark.parameterize()
 def test_convert(coordinate):
