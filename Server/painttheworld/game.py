@@ -22,7 +22,7 @@ class GameState:
           (0,0) is technically the center of our grid.
     """
 
-    def __init__(self, radius, gridsize):
+    def __init__(self):
         """Create a GameState object.
 
         Args:
@@ -34,8 +34,6 @@ class GameState:
         """
         size = 2*radius + 1
         self.grid = np.zeros((size, size), dtype=np.int8)
-        self.radius = radius
-        self.gridsize = gridsize
         self.user_count = 0
         self.user_coords = []
         self.user_grid = []
@@ -110,7 +108,7 @@ class GameState:
         horiz = math.floor(horiz * 1000 / const.gridsize)
         vert = math.floor(vert * 1000 / const.gridsize)
 
-        return np.add((self.radius + 1, self.radius + 1), (horiz, vert))
+        return np.add((const.radius + 1, const.radius + 1), (horiz, vert))
 
     def add_user(self, lat, lon):
         """ Adds a user and their starting location to the grid.
