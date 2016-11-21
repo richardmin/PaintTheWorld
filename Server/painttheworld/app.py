@@ -93,7 +93,8 @@ class Lobby(Resource):
             resp['center-coord-x'] = active_game.center_coord[0]
             resp['center-coord-y'] = active_game.center_coord[1]
             resp['radius'] = constants.radius
-            resp['gridsize'] = active_game.conversion_rates['lat_meters'] * constants.gridsize
+            resp['gridsize-longitude'] = 1 / active_game.conversion_rates['lat_meters'] * constants.gridsize 
+            resp['gridsize-latitude'] = 1 / active_game.conversion_rates['long_meters'] * constants.gridsize
         return resp
 
 # bind the APIs
