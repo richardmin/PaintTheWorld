@@ -23,8 +23,3 @@ def test_convert(coordinate):
     for i in range(0, constants.lobby_size):
         gs.add_user(10,10)
     assert gs.project(10, 10) == 11,11
-    # assert gs.project(11, 10) == 
-    # assert gs.project( 9, 10) ==
-    # assert gs.project(10, 11) ==
-    # assert gs.project(10,  9) == 
-    

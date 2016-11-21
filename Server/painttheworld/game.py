@@ -108,7 +108,7 @@ class GameState:
 
         """
         if np.sign(self.center_coord[0]) == np.sign(lon): # Case 1
-            if lon < self.center_coord[0]:
+            if lon > self.center_coord[0]:
                 horiz = -horiz
         if math.fabs(self.center_coord[0] - lon) < 180: # Case 2
             if self.center_coord[0] >= 0:
@@ -116,14 +116,9 @@ class GameState:
         elif self.center_coord[0] < 0: # Case 3
             horiz = -horiz
 
-        print (horiz)
-        print (vert)
-            
         horiz = math.floor(horiz * 1000 / constants.gridsize)
         vert = math.floor(vert * 1000 / constants.gridsize)
 
-        print(horiz)
-        print(vert)
         return np.add((self.radius + 1, self.radius + 1), (horiz, vert))
 
     def add_user(self, lat, lon):
