@@ -88,7 +88,3 @@ class Lobby(Resource):
 # bind the APIs
 api.add_resource(GameData, '/game_data')
 api.add_resource(Lobby, '/join_lobby')
-<<<<<<< HEAD
-
-=======
->>>>>>> game
