@@ -7,7 +7,7 @@ import datetime
 import math
 from painttheworld import const
 from painttheworld.const import m1, m2, m3, m4, p1, p2, p3
-from painttheworld.coordnates import haversine, conversion_rates
+from painttheworld.coord import haversine, conversion_rates
 
 ''' Note that Latitude is North/South and Longitude is West/East'''
 class GameState:
