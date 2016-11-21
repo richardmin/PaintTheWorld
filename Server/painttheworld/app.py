@@ -31,29 +31,32 @@ def validate_coordinates(coord):
 class GameData(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('user-id', type=int, location='form', required=True)
-        self.parser.add_argument('long', type=float, location='form', required=True)
-        self.parser.add_argument('lat', type=float, location='form', required=True)
+        self.parser.add_argument('user-id', type=int, required=True)
+        self.parser.add_argument('long', type=float, required=True)
+        self.parser.add_argument('lat', type=float, required=True)
 
     def post(self):
         args = self.parser.parse_args()
+        
         if active_game is None or active_game.start_time is None:
             return {'error': 'No game in progress.'}, 400
         elif args['user-id'] < 0 or args['user-id'] >= constants.lobby_size:
             return {'error': 'Invalid user id.'}, 400
         elif not validate_coordinates((args['long'], args['lat'])):
             return {'error': 'Invalid coordinates.'}, 400
-
-        returngrid, out_of_bounds = active_game.update_user(request.form['id'],
-                                             request.form['long'],
-                                             request.form['lat'])
-        # if out_of_bounds:
-        #     resp['out-of-bounds'] = True
         
-        # resp = json.dump(returngrid.tolist())
+        return_deltas, out_of_bounds = active_game.update_user(args['user-id'],
+                                             args['long'],
+                                             args['lat'])
+        resp = {}
+        if out_of_bounds:
+            resp['out-of-bounds'] = True
+        return_deltas = [[(1, 2), constants.Team.RED]]
+        
+        resp['grid-deltas'] = [{'coord': {'x': 1, 'y': 2}, 'color': 1}]
 
-        # return resp
-        return {}
+
+        return resp
 
 # TODO: Support multiple lobbies, probably in own file later
 # TODO: Make a game manager class that is in charge of cycling game state (a
@@ -61,8 +64,8 @@ class GameData(Resource):
 class Lobby(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('lat', type=float, location='form', required=True)
-        self.parser.add_argument('long', type=float, location='form', required=True)
+        self.parser.add_argument('lat', type=float, required=True)
+        self.parser.add_argument('long', type=float, required=True)
 
     def post(self):
         global active_game
@@ -72,7 +75,7 @@ class Lobby(Resource):
         if active_game is None:
             active_game = GameState(constants.radius, constants.gridsize)
 
-        usernum = active_game.add_user(request.form['lat'], request.form['long'])
+        usernum = active_game.add_user(args['lat'], args['long'])
         return {
             'user-id': usernum,
             'user-count': active_game.user_count
