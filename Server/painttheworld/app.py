@@ -15,18 +15,15 @@ app = Flask(__name__)
 app.config.from_object('config')
 api = Api(app)
 
-@app.route('/debug')
-def debug():
-    return render_template('debug.html')
-
-@app.route('/reset')
-def reset():
-    global active_game
-    active_game = None
-    
 def validate_coordinates(coord):
     lon, lat = coord
     return -180 <= lon <= 180 and -90 <= lat <= 90
+
+class Reset(Resource):
+    def get(self):
+        global active_game
+        active_game = None
+        return {'message': 'Reset successful, thank you for your business.'}
 
 class GameData(Resource):
     def __init__(self):
@@ -100,3 +97,4 @@ class Lobby(Resource):
 # bind the APIs
 api.add_resource(GameData, '/game_data')
 api.add_resource(Lobby, '/join_lobby')
+api.add_resource(Reset, '/reset')
