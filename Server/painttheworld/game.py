@@ -115,9 +115,12 @@ class GameState:
                 horiz = -horiz
         elif self.center_coord[0] < 0: # Case 3
             horiz = -horiz
+
+        print (horiz)
+        print (vert)
             
-        horiz = math.floor(horiz / 1000 / constants.gridsize)
-        vert = math.floor(vert / 1000 / constants.gridsize)
+        horiz = math.floor(horiz * 1000 / constants.gridsize)
+        vert = math.floor(vert * 1000 / constants.gridsize)
 
         print(horiz)
         print(vert)
