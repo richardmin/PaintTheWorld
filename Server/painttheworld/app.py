@@ -90,7 +90,8 @@ class Lobby(Resource):
         }
         if active_game.user_count == constants.lobby_size:
             resp['game-start-time'] = active_game.start_time.isoformat()
-            resp['center-coord'] = active_game.center_coord
+            resp['center-coord-x'] = active_game.center_coord[0]
+            resp['center-coord-y'] = active_game.center_coord[1]
             resp['radius'] = constants.radius
             resp['gridsize'] = active_game.conversion_rates['lat_meters'] * constants.gridsize
         return resp
