@@ -48,7 +48,7 @@ class GameData(Resource):
         return_deltas, out_of_bounds = active_game.update_user(args['user-id'],
                                              args['long'],
                                              args['lat'])
-
+        resp = {}
         if out_of_bounds:
             resp['out-of-bounds'] = True
         return_deltas = [[(1, 2), constants.Team.RED]]
