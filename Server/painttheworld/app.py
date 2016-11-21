@@ -44,10 +44,9 @@ class GameData(Resource):
         elif not validate_coordinates((args['long'], args['lat'])):
             return {'error': 'Invalid coordinates.'}, 400
 
-        active_game.update_user(request.form['id'],
-                                request.form['long'],
-                                request.form['lat'])
-
+        returngrid, out_of_bounds = active_game.update_user(request.form['id'],
+                                             request.form['long'],
+                                             request.form['lat'])
         return {}
 
 # TODO: Support multiple lobbies, probably in own file later
@@ -84,10 +83,9 @@ class Lobby(Resource):
             resp['game-start-time'] = active_game.start_time.isoformat()
             resp['center-coord'] = active_game.center_coord
             resp['radius'] = constants.radius
-            resp['gridsize'] = constants.gridsize
+            resp['g=ridsize'] = active_game.conversion_rates['lat_meters'] * constants.gridsize
         return resp
 
 # bind the APIs
 api.add_resource(GameData, '/game_data')
 api.add_resource(Lobby, '/join_lobby')
-
