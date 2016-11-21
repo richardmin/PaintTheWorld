@@ -7,8 +7,8 @@ __all__ = [ 'app' ]
 
 from flask import Flask, render_template, request
 from flask_restful import reqparse, Resource, Api
-from painttheworld import constants
-from painttheworld.constants import active_game
+from painttheworld import const
+from painttheworld.const import active_game
 from painttheworld.game import GameState
 
 app = Flask(__name__)
@@ -38,7 +38,7 @@ class GameData(Resource):
         args = self.parser.parse_args()
         if active_game is None or active_game.start_time is None:
             return {'error': 'No game in progress.'}, 400
-        elif args['user-id'] < 0 or args['user-id'] >= constants.lobby_size:
+        elif args['user-id'] < 0 or args['user-id'] >= const.lobby_size:
             return {'error': 'Invalid user id.'}, 400
         elif not validate_coordinates((args['long'], args['lat'])):
             return {'error': 'Invalid coordinates.'}, 400
@@ -63,7 +63,7 @@ class Lobby(Resource):
         if not validate_coordinates((args['long'], args['lat'])):
             return {'error': 'Invalid coordinates'}, 400
         if active_game is None:
-            active_game = GameState(constants.radius, constants.gridsize)
+            active_game = GameState(const.radius, const.gridsize)
 
         usernum = active_game.add_user(request.form['lat'], request.form['long'])
         return {
@@ -78,11 +78,11 @@ class Lobby(Resource):
         resp = {
             'user-count': active_game.user_count
         }
-        if active_game.user_count == constants.lobby_size:
+        if active_game.user_count == const.lobby_size:
             resp['game-start-time'] = active_game.start_time.isoformat()
             resp['center-coord'] = active_game.center_coord
-            resp['radius'] = constants.radius
-            resp['gridsize'] = active_game.conversion_rates['lat_meters'] * constants.gridsize
+            resp['radius'] = const.radius
+            resp['gridsize'] = active_game.conversion_rates['lat_meters'] * const.gridsize
         return resp
 
 # bind the APIs

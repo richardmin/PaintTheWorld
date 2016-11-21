@@ -1,4 +1,4 @@
-from painttheworld.constants import m1, m2, m3, m4, p1, p2, p3
+from painttheworld.const import m1, m2, m3, m4, p1, p2, p3
 
 def conversion_rates(coord):
     """Calculates the conversion rate for 1 degree of longitude to a variety

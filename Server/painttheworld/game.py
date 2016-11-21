@@ -5,8 +5,8 @@
 import numpy as np
 import datetime
 import math
-from painttheworld import constants
-from painttheworld.constants import m1, m2, m3, m4, p1, p2, p3
+from painttheworld import const
+from painttheworld.const import m1, m2, m3, m4, p1, p2, p3
 from painttheworld.coordnates import haversine, conversion_rates
 
 ''' Note that Latitude is North/South and Longitude is West/East'''
@@ -39,7 +39,7 @@ class GameState:
         self.user_count = 0
         self.user_coords = []
         self.user_grid = []
-        self.user_grid.extend([self.grid for i in range(constants.lobby_size)])
+        self.user_grid.extend([self.grid for i in range(const.lobby_size)])
 
     def start_game(self):
         """Initialize the starting position of the grid.
@@ -107,8 +107,8 @@ class GameState:
         elif self.center_coord[0] < 0: # Case 3
             horiz = -horiz
 
-        horiz = math.floor(horiz * 1000 / constants.gridsize)
-        vert = math.floor(vert * 1000 / constants.gridsize)
+        horiz = math.floor(horiz * 1000 / const.gridsize)
+        vert = math.floor(vert * 1000 / const.gridsize)
 
         return np.add((self.radius + 1, self.radius + 1), (horiz, vert))
 
@@ -119,10 +119,10 @@ class GameState:
         locations.  If there are enough users to begin the game, it initializes
         the game variables. 
         """
-        if self.user_count < constants.lobby_size:
+        if self.user_count < const.lobby_size:
             self.user_count += 1
             self.user_coords.append((lat, lon))
-            if self.user_count == constants.lobby_size:
+            if self.user_count == const.lobby_size:
                 self.start_game()
             return self.user_count-1
         else:
@@ -133,14 +133,14 @@ class GameState:
         out_of_bounds = check_grid_range(gridloc[0], gridloc[1])
         
         if not out_of_bounds:
-            self.grid[gridloc] = constants.Team.findTeam(id)
+            self.grid[gridloc] = const.Team.findTeam(id)
 
         returngrid =  diff(grid, self.user_grid[id])
         self.user_grid[id] = self.grid
         return returngrid, out_of_bounds
 
     def check_grid_range(self, coord):
-        return coord[0] >= 0 and coord[1] >=0 and coord[0] < constants.radius*2+1 and coord[1] < constants.radius*2+1
+        return coord[0] >= 0 and coord[1] >=0 and coord[0] < const.radius*2+1 and coord[1] < const.radius*2+1
          
     @staticmethod
     def diff(a, b):
