@@ -23,6 +23,9 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import java.util.HashMap;
+import android.os.Handler;
+import java.lang.Runnable;
 
 import org.json.*;
 
@@ -31,6 +34,7 @@ public class LoginActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener{
     Button b1;
+    View b;
     TextView tx1;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest locationRequest;
@@ -39,15 +43,52 @@ public class LoginActivity extends AppCompatActivity implements
     private com.google.android.gms.location.FusedLocationProviderApi fusedLocationProviderApi;
     private android.location.Location mLocation = new android.location.Location("");
     private boolean locationIsValid = false;
+    private boolean buttonVisible = false;
+    private Handler pollingHandler = new Handler();
+    private Calendar gameStartCalendar;
+    private Calendar nowCalendar;
+    private Intent switchToMaps;
+    private int user_id;
+    private String gameStartTime;
 
     public final static String USER_ID = "painttheworld.USER_ID";
+    public final static String GAME_ISO_TIME = "painttheworld.GAME_ISO_TIME";
     public static final int LOCATION_INTERVAL = 100;
     private static final String TAG = "LoginActivity";
+
+    final Runnable pollServerForStartTime = new Runnable() {
+        public void run() {
+            waitForGame();
+            pollingHandler.postDelayed(pollServerForStartTime, 1400);
+        }
+    };
+    final Runnable pollToSeeIfGameHasStarted = new Runnable() {
+        public void run() {
+            String now = ISO8601.now();
+            try {
+                nowCalendar = ISO8601.toCalendar(now);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            if (nowCalendar.after(gameStartCalendar)) {
+                //Go to MapsActivity
+                switchToMaps = new Intent(LoginActivity.this, MapsActivity.class);
+                switchToMaps.putExtra(USER_ID, user_id);
+                switchToMaps.putExtra(GAME_ISO_TIME, gameStartTime);
+                startActivity(switchToMaps);
+                pollingHandler.removeCallbacks(pollToSeeIfGameHasStarted);
+            }
+            else {
+                pollingHandler.postDelayed(pollToSeeIfGameHasStarted, 500);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
 
         //Get location
         if (ContextCompat.checkSelfPermission(this,
@@ -60,6 +101,7 @@ public class LoginActivity extends AppCompatActivity implements
         getLocation();
 
         b1 = (Button) findViewById(R.id.JoinButton);
+        b = findViewById(R.id.JoinButton);
         tx1 = (TextView) findViewById(R.id.AboutText);
         tx1.setTextSize(30);
         tx1.setText("Loading...");
@@ -85,6 +127,10 @@ public class LoginActivity extends AppCompatActivity implements
     @Override
     public void onLocationChanged(android.location.Location location) {
         locationIsValid = true;
+        if (!buttonVisible) {
+            b.setVisibility(View.VISIBLE);
+            buttonVisible = true;
+        }
         tx1.setText("\nHello!\n\nWelcome to\nPaintTheWorld!");
         mLocation.set(location);
         Log.d("LOCATION:", mLocation.getLatitude() + ", " + mLocation.getLongitude());
@@ -96,15 +142,41 @@ public class LoginActivity extends AppCompatActivity implements
         if (!locationIsValid) {
             return;
         }
-        ConnectionTask task = new ConnectionTask();
-        String[] params = new String[2];
-        params[0] = String.valueOf(mLocation.getLatitude());
-        params[1] = String.valueOf(mLocation.getLongitude());
-        task.execute(params);
-        waitForGame();
+        final String URL = "http://ec2-54-153-39-233.us-west-1.compute.amazonaws.com/join_lobby";
+        // Post params to be sent to the server
+        HashMap<String, Double> params = new HashMap<String, Double>();
+        params.put("lat", mLocation.getLatitude());
+        params.put("long", (mLocation.getLongitude()));
+
+        JsonObjectRequest req = new JsonObjectRequest(URL, new JSONObject(params),
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            user_id = response.getInt("user-id");
+                            if (user_id != -1) {
+                                pollingHandler.post(pollServerForStartTime);
+                            }
+                            else {
+                                Log.d("User_id", String.valueOf(user_id));
+                                tx1.setText("Please try again later.");
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+            }
+        });
+
+        // add the request object to the queue to be executed
+        ApplicationController.getInstance().addToRequestQueue(req);
     }
 
     private void waitForGame() {
+        b.setVisibility(View.GONE);
         RequestQueue queue = Volley.newRequestQueue(this);
         String url ="http://ec2-54-153-39-233.us-west-1.compute.amazonaws.com/join_lobby";
 
@@ -115,20 +187,23 @@ public class LoginActivity extends AppCompatActivity implements
                     public void onResponse(JSONObject response) {
                         // Do stuff here, successful request
                         try {
-                            String gameStartTime = response.getString("game_start_time");
+                            if (!response.has("game-start-time")) {
+                                Log.d("Continuing to poll", "hi");
+                                return;
+                            }
+                            pollingHandler.removeCallbacks(pollServerForStartTime);
+                            gameStartTime = response.getString("game-start-time");
                             String now = ISO8601.now();
-                            Calendar gameStartCalendar = Calendar.getInstance();
-                            Calendar nowCalendar = Calendar.getInstance();
+                            gameStartCalendar = Calendar.getInstance();
+                            nowCalendar = Calendar.getInstance();
                             try {
                                 gameStartCalendar = ISO8601.toCalendar(gameStartTime);
                                 nowCalendar = ISO8601.toCalendar(now);
                             } catch (ParseException e) {
                                 //Handle error???
                             }
+                            pollingHandler.post(pollToSeeIfGameHasStarted);
 
-                            if (nowCalendar.after(gameStartCalendar)) {
-                                //Go to MapsActivity
-                            }
                         } catch (JSONException e) {
                             //idk but it died
                             e.printStackTrace();
@@ -141,7 +216,7 @@ public class LoginActivity extends AppCompatActivity implements
             }
         });
         // Add the request to the RequestQueue.
-        queue.add(jsonRequest);
+        ApplicationController.getInstance().addToRequestQueue(jsonRequest);
     }
 
     //Methods for connecting to Google Play Services API
