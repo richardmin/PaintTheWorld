@@ -31,9 +31,9 @@ def validate_coordinates(coord):
 class GameData(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('user-id', type=int, location='form', required=True)
-        self.parser.add_argument('long', type=float, location='form', required=True)
-        self.parser.add_argument('lat', type=float, location='form', required=True)
+        self.parser.add_argument('user-id', type=int, required=True)
+        self.parser.add_argument('long', type=float, required=True)
+        self.parser.add_argument('lat', type=float, required=True)
 
     def post(self):
         args = self.parser.parse_args()
@@ -61,8 +61,8 @@ class GameData(Resource):
 class Lobby(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('lat', type=float, location='form', required=True)
-        self.parser.add_argument('long', type=float, location='form', required=True)
+        self.parser.add_argument('lat', type=float, required=True)
+        self.parser.add_argument('long', type=float, required=True)
 
     def post(self):
         global active_game
