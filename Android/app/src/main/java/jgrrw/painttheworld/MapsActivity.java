@@ -13,6 +13,8 @@ import android.content.Intent;
 import android.provider.Settings;
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.view.View;
+
 
 import java.util.TimerTask;
 import java.util.Timer;
@@ -38,6 +40,9 @@ public class MapsActivity extends FragmentActivity implements
         GoogleApiClient.OnConnectionFailedListener,
         com.google.android.gms.location.LocationListener{
 
+    public final static String GAME_END_STATUS = "jggrw.painttheworld.GAME_END_STATUS";
+    public final static String RED_TEAM_SCORE = "jggrw.painttheworld.RED_TEAM_SCORE";
+    public final static String BLUE_TEAM_SCORE = "jggrw.painttheworld.BLUE_TEAM_SCORE";
     private GoogleMap mMap;
     private TimerTask timerTask;
     private Timer timer;
@@ -266,4 +271,18 @@ public class MapsActivity extends FragmentActivity implements
         };
     }
 
+    /**
+     * Prepares data to be displayed in GameOverActivity and changes to GameOverActivity
+     * @param view
+     */
+    public void gameOver(View view){
+        Intent intent = new Intent(this, GameOverActivity.class);
+        //TODO: Get meaningful end game status from server. Possibly score as well?
+        //Current it just puts some meaningless placeholders
+        String status = "Victory!";
+        intent.putExtra(GAME_END_STATUS, status);
+        intent.putExtra(RED_TEAM_SCORE, 100);
+        intent.putExtra(BLUE_TEAM_SCORE, 150);
+        startActivity(intent);
+    }
 }
