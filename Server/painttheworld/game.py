@@ -120,7 +120,7 @@ class GameState:
         """
         if self.user_count < constants.lobby_size:
             self.user_count += 1
-            self.user_coords.append((lat, lon))
+            self.user_coords.append((float(lat), float(lon)))
             if self.user_count == constants.lobby_size:
                 self.start_game()
             return self.user_count-1
@@ -128,13 +128,13 @@ class GameState:
             return -1
 
     def update_user(self, id, lon, lat):
-        gridloc = project(lon, lat)
-        out_of_bounds = check_grid_range(gridloc[0], gridloc[1])
+        gridloc = self.project(lon, lat)
+        out_of_bounds = self.check_grid_range(gridloc)
         
         if not out_of_bounds:
-            self.grid[gridloc[0]][gridloc[1]] = constants.Team.findTeam(id)
+            self.grid[gridloc] = constants.Team.findTeam(id)
 
-        returngrid =  diff(grid, self.user_grid[id])
+        returngrid =  self.diff(self.user_grid[id], self.grid)
         self.user_grid[id] = self.grid
         return returngrid, out_of_bounds
 
@@ -150,7 +150,7 @@ class GameState:
         Returns:
             List of coordinate/team pairings of the form ((x,y), team_color).
         """
-        diff = np.absolute(a.grid - b.grid)
+        diff = np.absolute(a - b)
         coord = np.nonzero(diff)
         val = diff[coord]
         coord = map(tuple, np.transpose(coord))  # turn coord into (x,y) tuples
