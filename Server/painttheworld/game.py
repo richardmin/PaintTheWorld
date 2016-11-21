@@ -6,16 +6,7 @@ import numpy as np
 import datetime
 import math
 from painttheworld import constants
-# from painttheworld.constants.GPS import m1, m2, m3, m4, p1, p2, p3
-
-m1 = 111132.92  # latitude calculation term 1
-m2 = -559.82    # latitude calculation term 2
-m3 = 1.175      # latitude calculation term 3
-m4 = -0.0023    # latitude calculation term 4
-p1 = 111412.84  # longitude calculation term 1
-p2 = -93.5      # longitude calculation term 2
-p3 = 0.118      # longitude calculation term 3
-
+from painttheworld.constants import m1, m2, m3, m4, p1, p2, p3
 
 ''' Note that Latitude is North/South and Longitude is West/East'''
 class GameState:
@@ -57,7 +48,6 @@ class GameState:
         really how nautical miles work). Additionally, it sets the start time to
         be 3 seconds from now.
         """
-        length = len(self.user_coords)
         self.center_coord = np.mean(self.user_coords, axis=1)
         self.conversion_rates = self.conversion_rates(self.center_coord)
         self.start_time = (datetime.datetime.now() + datetime.timedelta(seconds=3))
