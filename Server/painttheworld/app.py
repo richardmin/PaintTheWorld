@@ -5,7 +5,7 @@
 
 __all__ = [ 'app' ]
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, json
 from flask_restful import reqparse, Resource, Api
 from painttheworld import constants
 from painttheworld.constants import active_game
@@ -47,6 +47,12 @@ class GameData(Resource):
         returngrid, out_of_bounds = active_game.update_user(request.form['id'],
                                              request.form['long'],
                                              request.form['lat'])
+        # if out_of_bounds:
+        #     resp['out-of-bounds'] = True
+        
+        # resp = json.dump(returngrid.tolist())
+
+        # return resp
         return {}
 
 # TODO: Support multiple lobbies, probably in own file later
