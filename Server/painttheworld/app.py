@@ -19,6 +19,11 @@ api = Api(app)
 def debug():
     return render_template('debug.html')
 
+@app.route('/reset')
+def reset():
+    global active_game
+    active_game = None
+    
 def validate_coordinates(coord):
     lon, lat = coord
     return -180 <= lon <= 180 and -90 <= lat <= 90
@@ -39,10 +44,9 @@ class GameData(Resource):
         elif not validate_coordinates((args['long'], args['lat'])):
             return {'error': 'Invalid coordinates.'}, 400
 
-        active_game.update_user(request.form['id'],
-                                request.form['long'],
-                                request.form['lat'])
-
+        returngrid, out_of_bounds = active_game.update_user(request.form['id'],
+                                             request.form['long'],
+                                             request.form['lat'])
         return {}
 
 # TODO: Support multiple lobbies, probably in own file later
@@ -79,7 +83,7 @@ class Lobby(Resource):
             resp['game-start-time'] = active_game.start_time.isoformat()
             resp['center-coord'] = active_game.center_coord
             resp['radius'] = constants.radius
-            resp['gridsize'] = constants.gridsize
+            resp['gridsize'] = active_game.conversion_rates['lat_meters'] * constants.gridsize
         return resp
 
 # bind the APIs
