@@ -144,6 +144,8 @@ class GameState:
     @staticmethod
     def diff(a, b):
         """Calculate the deltas of two GameState objects.
+            a is the "older" GameState object
+            b is the "updated" GameState object
 
         Returns:
             List of coordinate/team pairings of the form ((x,y), team_color).
@@ -173,7 +175,7 @@ class GameState:
                       )
 
         longlen = (p1 * math.cos(1 * latitude)) + \
-                  (p2 * math.cos(3 * latitude)) + \ 
+                  (p2 * math.cos(3 * latitude)) + \
                   (p3 * math.cos(5 * latitude))
 
         dict['lat_meters'] = latlen
