@@ -37,6 +37,7 @@ class GameState:
         self.gridsize = gridsize
         self.user_count = 0
         self.user_coords = []
+        self.user_grid = []
 
     def start_game(self):
         """Initialize the starting position of the grid.
@@ -47,7 +48,7 @@ class GameState:
         be 3 seconds from now.
         """
         self.center_coord = np.mean(self.user_coords, axis=1)
-        self.longitude_conversion = self.calculateLongitude(self.center_coord)
+        self.conversion_rates = self.conversion_rates(self.center_coord)
         self.start_time = (datetime.datetime.now() + datetime.timedelta(seconds=3))
 
     def update(self, coord, team):
@@ -69,32 +70,46 @@ class GameState:
         if lat > self.center_coord[1]:
             vert = -vert
 
-        """ Vectorizes the longitude. The degree anges from -180 to 180.
+        """ Vectorizes the longitude. The degree ranges from -180 to 180.
             There's three cases: 
                 1. They're both in the same hemisphere (east/west)
                 2. They cross over the 0 degree line
                 3. They cross over the 180 degree line
             
             Case (1):
+                Check for case 1 by ensuring that the signs are identical.
                 If the longitude of the location is less than the longitude of the cenral
                 location, that means that we need to move left in the array. 
-                We change the sign to be negative
+                We change the sign to be negative.
+            Case (2) + (3):
+                There's two cases here, where the signs are differing. 
+                To determine which line we're crossing, the absolute value of the difference
+                in Longitudes is taken. If the difference >180, 
+                that implies that the 180 degree is being crossed. Otherwise, it's the 0 degree line.
+
             Case (2):
-                
+                In case (2), if the longitude of the central point is negative, the distance must be positive.
+                If the longitude of the central point is positive, the distance must be negative.
+            
             Case (3):
+                In case (3), if the longitude of the central point is negative, the distance must be negative.
+                If the longitude of the central point is positive, the distance must be positive.
 
         """
-        if np.sign(self.center_coord[0]) == np.sign(lon):
+        if np.sign(self.center_coord[0]) == np.sign(lon): # Case 1
             if lon < self.center_coord:
                 horiz = -horiz
-        elif self.center_coord[0] < 0 and lon < 0:
-            if lon < self.center_coord: 
+        if math.fabs(self.center_coord[0] - lon) < 180: # Case 2
+            if self.center_coord[0] >= 0:
                 horiz = -horiz
-        elif self.center_coord[0] < 0 and lon > 0:
-        elif self.center_coord[0] > 0 and lon < 0:
+        else if self.center_coord < 0: # Case 3
             horiz = -horiz
-
             
+        horiz = math.floor(horiz / 1000 / gridsize)
+        vert = math.floor(vert / 1000 / gridsize)
+
+        return np.add((radius + 1, radius + 1), (horiz, vert))
+
     def add_user(self, lat, lon):
         """ Adds a user and their starting location to the grid.
 
@@ -111,9 +126,13 @@ class GameState:
         else:
             return -1
 
-    # def update_user(self, id, lat, lon):
-    #     # update the user
-    #     self.grid[]
+    def update_user(self, id, lon, lat):
+        # update the user
+        gridloc = convert(lon, lat)
+        self.grid[gridloc[0]][gridloc[1]] = constants.Team.findTeam(id)
+        returngrid =  diff(grid, self.user_grid[id])
+        self.user_grid[id] = self.grid
+        return returngrid
 
     @staticmethod
     def diff(a, b):
