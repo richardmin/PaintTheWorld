@@ -64,7 +64,7 @@ class GameData(Resource):
     def fmt_diff(coord, team):
         x, y = coord
         return {
-            'coord': {'x': int(x), 'y': int(y)},
+            'coord': {'x': x.item(), 'y': y.item()},
             'color': team
         }
 
