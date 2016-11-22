@@ -72,7 +72,7 @@ public class MapsActivity extends FragmentActivity implements
     //Update location every 100 milliseconds
     public static final int LOCATION_INTERVAL = 100;
 
-    // TextView playerTeam;
+    TextView playerTeam;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,13 +91,15 @@ public class MapsActivity extends FragmentActivity implements
 
         getLocation();
 
-        // playerTeam = (TextView) findViewById(R.id.Team);
-        // playerTeam.setText("loading");
+        playerTeam = (TextView) findViewById(R.id.Team);
+        playerTeam.setText("loading");
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        final TextView textView = new TextView(this);
     }
 
 
@@ -211,15 +213,20 @@ public class MapsActivity extends FragmentActivity implements
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
         // This information needs to be obtained from the server during login time.
-        // TODO: Change these to intents - obtain information from the login activity.
+
         double centerX = getIntent().getExtras().getDouble(LoginActivity.CENTER_COORD_X);
         double centerY = getIntent().getExtras().getDouble(LoginActivity.CENTER_COORD_Y);
         int radius = getIntent().getExtras().getInt(LoginActivity.RADIUS);
         length = (2 * radius) + 1;
-        blockSize = getIntent().getExtras().getDouble(LoginActivity.GRIDSIZE_LONGITUDE);  // potentially add two different blocksizes?
+        blockSize = getIntent().getExtras().getDouble(LoginActivity.GRIDSIZE_LONGITUDE);  // potentially add two different blocksizes? */
         user_id = getIntent().getExtras().getInt(LoginActivity.USER_ID);
+        Log.d("centerX", String.valueOf(centerX));
+        Log.d("centerY", String.valueOf(centerY));
+        Log.d("radius", String.valueOf(radius));
+        Log.d("length", String.valueOf(length));
+        Log.d("blockSize", String.valueOf(blockSize));
+        Log.d("user_id", String.valueOf(user_id));
 
-        /*
         if (user_id < 3) // user on team red
         {
             teamColor = 1;
@@ -229,7 +236,7 @@ public class MapsActivity extends FragmentActivity implements
         {
             teamColor = 2;
             playerTeam.setText("You are on team blue!");
-        } */
+        }
 
         // This grid contains the locations of all the paint on the map.
         // Each location needs to be mapped to a coordinate before it can be painted.
@@ -241,15 +248,10 @@ public class MapsActivity extends FragmentActivity implements
         startY = (centerY - blockSize/2) - (radius * blockSize);
         gameGrid = new int[length][length];     // should be 101 x 101
         LatLng battlegroundCenter = new LatLng(centerX, centerY);
-        float zoomLevel = 18.1f;
+        float zoomLevel = 16.5f;
 
         mMap.addMarker(new MarkerOptions().position(battlegroundCenter).title("Center of battleground."));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(battlegroundCenter, zoomLevel));
-        //Disable camera movement
-        mMap.getUiSettings().setScrollGesturesEnabled(true);
-        mMap.getUiSettings().setZoomControlsEnabled(false);
-        mMap.getUiSettings().setAllGesturesEnabled(true);
-        mMap.getUiSettings().setRotateGesturesEnabled(false);
 
         // Draw square around arena.
         String color = "#2500FF00"; // green
@@ -309,7 +311,6 @@ public class MapsActivity extends FragmentActivity implements
                                             JSONArray diffs = response.getJSONArray("grid-deltas");
                                             int numberOfDiffs = diffs.length();
                                             for (int i = 0; i < numberOfDiffs; i++) {
-                                                //TODO: paint numberOfDiffs amount of times
                                                 JSONObject singleDiff = diffs.getJSONObject(i);
                                                 JSONObject singleDiffCoord = singleDiff.getJSONObject("coord");
                                                 int x = singleDiffCoord.getInt("x");
@@ -343,9 +344,6 @@ public class MapsActivity extends FragmentActivity implements
                         colorCode = 2;
                         drawPaintAt(x, y, colorCode);
                         gameGrid[x][y] = colorCode;
-
-                        // TODO: End game (by switching to end game Activity) once end-time is reached.
-
                     }
                 });
             }
