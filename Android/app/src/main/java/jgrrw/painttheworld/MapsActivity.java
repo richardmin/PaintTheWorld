@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.server.converter.StringToIntConverter;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationListener;
@@ -125,8 +126,7 @@ public class MapsActivity extends FragmentActivity implements
             Log.e("GET LOCATION", e.toString());
         }
 
-        //Start main game logic loop
-        timerStart();
+
     }
 
     @Override
@@ -181,8 +181,8 @@ public class MapsActivity extends FragmentActivity implements
         else
             return;
 
-        double top_lat     =  startX + y*blockSize + blockSize/2;
-        double bottom_lat  =  startX + y*blockSize - blockSize/2;
+        double top_lat     =  startX - y*blockSize + blockSize/2;
+        double bottom_lat  =  startX - y*blockSize - blockSize/2;
         double top_long    =  startY + x*blockSize + blockSize/2;
         double bottom_long =  startY + x*blockSize - blockSize/2;
 
@@ -206,20 +206,21 @@ public class MapsActivity extends FragmentActivity implements
         double centerY = -118.442165;
         double startTime = 0;
         double endTime = 0;
-        int length = 100;
+        int radius = 50;
+        int length = (2 * radius) + 1;
         blockSize = 0.00001;
 
         // This grid contains the locations of all the paint on the map.
         // Each location needs to be mapped to a coordinate before it can be painted.
-        // Lower left position of the grid is mapped to startX and startY - simply map by multiplying x and y by blockSize and adding to startY and startX.
+        // Top left position of the grid is mapped to startX and startY - simply map by multiplying x and y by blockSize and adding to startY and startX.
         // 0 = empty
         // 1 = red
         // 2 = blue
-        startX = centerX - (length/2) * blockSize;
-        startY = centerY - (length/2) * blockSize;
-        gameGrid = new int[length][length];
+        startX = (centerX + blockSize/2) + (radius * blockSize);
+        startY = (centerY - blockSize/2) - (radius * blockSize);
+        gameGrid = new int[length][length];     // should be 101 x 101
         LatLng battlegroundCenter = new LatLng(centerX, centerY);
-        float zoomLevel = 19.1f;
+        float zoomLevel = 18.1f;
 
         mMap.addMarker(new MarkerOptions().position(battlegroundCenter).title("Center of battleground."));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(battlegroundCenter, zoomLevel));
@@ -231,8 +232,8 @@ public class MapsActivity extends FragmentActivity implements
 
         // Draw square around arena.
         String color = "#2500FF00"; // green
-        double top_lat     =  startX + length * blockSize;
-        double bottom_lat  =  startX;
+        double top_lat     =  startX;
+        double bottom_lat  =  startX - length * blockSize;
         double top_long    =  startY + length * blockSize;
         double bottom_long =  startY;
         PolygonOptions polygonOptions = new PolygonOptions()
@@ -259,6 +260,12 @@ public class MapsActivity extends FragmentActivity implements
                         drawPaintAt(x, y, colorCode);
                         gameGrid[x][y] = colorCode;
 
+                        x = 5;
+                        y = 5;
+                        colorCode = 2;
+                        drawPaintAt(x, y, colorCode);
+                        gameGrid[x][y] = colorCode;
+
                         // TODO: Insert code here that sends currentX, currentY coordinates to server.
                         double currentX = mLocation.getLongitude();
                         double currentY = mLocation.getLatitude();
@@ -269,6 +276,9 @@ public class MapsActivity extends FragmentActivity implements
                 });
             }
         };
+
+        //Start main game logic loop
+        timerStart();
     }
 
     /**
