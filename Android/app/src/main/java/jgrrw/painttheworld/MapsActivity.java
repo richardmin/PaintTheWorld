@@ -55,7 +55,7 @@ public class MapsActivity extends FragmentActivity implements
     private TimerTask timerTask;
     private Timer timer;
     private GoogleApiClient mGoogleApiClient;
-    private android.location.Location mLocation = new android.location.Location("");
+    private android.location.Location mLocation;
     private static final String TAG = "MapsActivity";
     private LocationRequest locationRequest;
     private LocationListener locationListener;
@@ -88,6 +88,7 @@ public class MapsActivity extends FragmentActivity implements
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
+        mLocation = new android.location.Location("");
 
         getLocation();
 
@@ -371,7 +372,7 @@ public class MapsActivity extends FragmentActivity implements
                     blueScore++;
             }
         }
-        String status = "You screwed up somewhere in the code";
+        String status = "Error: No game result assigned";
         if (teamColor == 1)
         {
             if (redScore > blueScore) {
