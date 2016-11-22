@@ -54,15 +54,17 @@ class GameData(Resource):
         resp = {}
         if out_of_bounds:
             resp['out-of-bounds'] = True
-        return {}
+        print(deltas)
         resp['grid-deltas'] = [self.fmt_diff(coord, team) for coord, team in deltas]
-        return resp
+        print(resp)
+        return resp.__str__
+        return "{'grid-deltas': [{'color': 1, 'coord': {'y': 51, 'x': 51}}]}"
 
     @staticmethod
     def fmt_diff(coord, team):
         x, y = coord
         return {
-            'coord': {'x': x, 'y': y},
+            'coord': {'x': int(x), 'y': int(y)},
             'color': team
         }
 
