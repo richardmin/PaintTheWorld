@@ -132,7 +132,7 @@ class GameState:
         currtime = datetime.datetime.now()
         if self.start_time < currtime < self.end_time: 
             gridloc = self.project(lon, lat)
-            out_of_bounds = not self.check_grid_range(gridloc)
+            out_of_bounds = not self.inside_grid(gridloc)
             
             if not out_of_bounds:
                 self.grid[gridloc] = constants.Team.findTeam(id)
@@ -146,8 +146,12 @@ class GameState:
             else:
                 raise RuntimeError('Game over.')
 
-    def check_grid_range(self, coord):
-        return coord[0] >= 0 and coord[1] >=0 and coord[0] < constants.radius*2+1 and coord[1] < constants.radius*2+1
+    def inside_grid(self, coord):
+        lowest_coord = (0,0)
+        highest_coord = (constants.radius*2 + 1, constants.radius*2 + 1)
+        lower_bound = np.all(np.greater_equal(coord, lowest_coord))
+        upper_bound = np.all(np.less_equal(coord, highest_coord))
+        return lower_bound and upper_bound
          
     @staticmethod
     def diff(a, b):

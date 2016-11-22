@@ -43,7 +43,7 @@ class GameData(Resource):
             return {'error': 'Invalid coordinates.'}, 400
         
         try:
-            return_deltas, out_of_bounds = active_game.update_user(
+            deltas, out_of_bounds = active_game.update_user(
                 args['user-id'],
                 args['long'],
                 args['lat']
