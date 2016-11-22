@@ -49,13 +49,13 @@ class GameData(Resource):
                 args['lat']
             )
         except RuntimeError as e:
-            return {'error': e.args}, 400
+            return {'error': e.args[0]}, 400
 
         resp = {}
         if out_of_bounds:
             resp['out-of-bounds'] = True
-
-        resp['grid-deltas'] = [fmt_diff(coord, team) for coord, team in deltas]
+        return {}
+        resp['grid-deltas'] = [self.fmt_diff(coord, team) for coord, team in deltas]
         return resp
 
     @staticmethod
