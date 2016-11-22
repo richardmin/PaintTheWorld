@@ -43,19 +43,28 @@ class GameData(Resource):
             return {'error': 'Invalid coordinates.'}, 400
         
         try:
-            return_deltas, out_of_bounds = active_game.update_user(args['user-id'],
-                                                 args['long'],
-                                                 args['lat'])
+            return_deltas, out_of_bounds = active_game.update_user(
+                args['user-id'],
+                args['long'],
+                args['lat']
+            )
         except RuntimeError as e:
             return {'error': e.args}, 400
 
         resp = {}
         if out_of_bounds:
             resp['out-of-bounds'] = True
-        resp['grid-deltas'] = [{'coord': {'x': 1, 'y': 2}, 'color': 1}]
 
-
+        resp['grid-deltas'] = [fmt_diff(coord, team) for coord, team in deltas]
         return resp
+
+    @staticmethod
+    def fmt_diff(coord, team):
+        x, y = coord
+        return {
+            'coord': {'x': x, 'y': y},
+            'color': team
+        }
 
 # TODO: Support multiple lobbies, probably in own file later
 # TODO: Make a game manager class that is in charge of cycling game state (a
