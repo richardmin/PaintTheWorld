@@ -48,9 +48,7 @@ class GameState:
         really how nautical miles work). Additionally, it sets the start time to
         be 3 seconds from now.
         """
-        print(self.user_coords)
         self.center_coord = np.mean(self.user_coords, axis=0)
-        print(self.center_coord)
         self.conversion_rates = self.conversion_rates(self.center_coord)
         self.start_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
         self.end_time = self.start_time + datetime.timedelta(minutes=3)
@@ -64,14 +62,15 @@ class GameState:
         """ Casts a GPS coordinate onto the grid, which has it's central
         locations defined by center_coord.
         """
-        vert = GameState.haversine(self.center_coord[0], self.center_coord[1], self.center_coord[0], lat) # longitude is east-west, we ensure that's the sam'
-        horiz = GameState.haversine(self.center_coord[0], self.center_coord[1], lon, self.center_coord[1])
-
+        vert = GameState.haversine(self.center_coord[1], self.center_coord[0], self.center_coord[1], lat) # longitude is east-west, we ensure that's the sam'
+        horiz = GameState.haversine(self.center_coord[1], self.center_coord[0], lon, self.center_coord[0])
+        print(vert)
+        print(horiz)
         """ Vectorizes the latitude. The degree ranges from -90 to 90.
             This latitude conversion doesn't handle poles.
             I'm not sure how to handle you playing the game at the north and south pole.
         """ 
-        if lat > self.center_coord[1]:
+        if lat > self.center_coord[0]:
             vert = -vert
 
         """ Vectorizes the longitude. The degree ranges from -180 to 180.
@@ -100,14 +99,17 @@ class GameState:
                 If the longitude of the central point is positive, the distance must be positive.
 
         """
-        if np.sign(self.center_coord[0]) == np.sign(lon): # Case 1
-            if lon > self.center_coord[0]:
+        if np.sign(self.center_coord[1]) == np.sign(lon): # Case 1
+            if lon > self.center_coord[1]:
                 horiz = -horiz
-        if math.fabs(self.center_coord[0] - lon) < 180: # Case 2
-            if self.center_coord[0] >= 0:
+        if math.fabs(self.center_coord[1] - lon) < 180: # Case 2
+            if self.center_coord[1] >= 0:
                 horiz = -horiz
-        elif self.center_coord[0] < 0: # Case 3
+        elif self.center_coord[1] < 0: # Case 3
             horiz = -horiz
+
+        # print(vert)
+        # print(horiz)
 
         horiz = math.floor(horiz * 1000 / constants.gridsize)
         vert = math.floor(vert * 1000 / constants.gridsize)
@@ -140,6 +142,8 @@ class GameState:
                 self.grid[gridloc[0]][gridloc[1]] = constants.Team.findTeam(id)
 
             returngrid =  self.diff(self.user_grid[id], self.grid)
+            print(returngrid)
+            print(gridloc)
             self.user_grid[id] = self.grid
             return returngrid, out_of_bounds
         else:
