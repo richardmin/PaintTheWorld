@@ -48,7 +48,9 @@ class GameState:
         really how nautical miles work). Additionally, it sets the start time to
         be 3 seconds from now.
         """
-        self.center_coord = np.mean(self.user_coords, axis=1)
+        print(self.user_coords)
+        self.center_coord = np.mean(self.user_coords, axis=0)
+        print(self.center_coord)
         self.conversion_rates = self.conversion_rates(self.center_coord)
         self.start_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
         self.end_time = self.start_time + datetime.timedelta(minutes=3)
