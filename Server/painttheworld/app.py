@@ -62,7 +62,7 @@ class GameData(Resource):
         x, y = coord
         return {
             'coord': {'x': x.item(), 'y': y.item()},
-            'color': team
+            'color': team.item()
         }
 
 # TODO: Support multiple lobbies, probably in own file later
