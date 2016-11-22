@@ -132,9 +132,6 @@ class GameState:
         currtime = datetime.datetime.now()
         if self.start_time < currtime < self.end_time: 
             gridloc = self.project(lon, lat)
-            print(gridloc[0])
-            print(gridloc[1])
-            print(constants.radius*2+1)
             out_of_bounds = not self.check_grid_range(gridloc)
             
             if not out_of_bounds:
