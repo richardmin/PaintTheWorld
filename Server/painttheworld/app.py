@@ -52,8 +52,6 @@ class GameData(Resource):
         resp = {}
         if out_of_bounds:
             resp['out-of-bounds'] = True
-        # return_deltas = [[(1, 2), constants.Team.RED]]
-        print(return_deltas)
         resp['grid-deltas'] = [{'coord': {'x': 1, 'y': 2}, 'color': 1}]
 
 
