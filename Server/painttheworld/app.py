@@ -42,9 +42,13 @@ class GameData(Resource):
         elif not validate_coordinates((args['long'], args['lat'])):
             return {'error': 'Invalid coordinates.'}, 400
         
-        return_deltas, out_of_bounds = active_game.update_user(args['user-id'],
-                                             args['long'],
-                                             args['lat'])
+        try:
+            return_deltas, out_of_bounds = active_game.update_user(args['user-id'],
+                                                 args['long'],
+                                                 args['lat'])
+        except RuntimeError as e:
+            return {'error': e.args}, 400
+
         resp = {}
         if out_of_bounds:
             resp['out-of-bounds'] = True
