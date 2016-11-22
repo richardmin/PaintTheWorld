@@ -15,25 +15,22 @@ app = Flask(__name__)
 app.config.from_object('config')
 api = Api(app)
 
-@app.route('/debug')
-def debug():
-    return render_template('debug.html')
-
-@app.route('/reset')
-def reset():
-    global active_game
-    active_game = None
-    
 def validate_coordinates(coord):
     lon, lat = coord
     return -180 <= lon <= 180 and -90 <= lat <= 90
 
+class Reset(Resource):
+    def get(self):
+        global active_game
+        active_game = None
+        return {'message': 'Reset successful, thank you for your business.'}
+
 class GameData(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('user-id', type=int, location='form', required=True)
-        self.parser.add_argument('long', type=float, location='form', required=True)
-        self.parser.add_argument('lat', type=float, location='form', required=True)
+        self.parser.add_argument('user-id', type=int, required=True)
+        self.parser.add_argument('long', type=float, required=True)
+        self.parser.add_argument('lat', type=float, required=True)
 
     def post(self):
         args = self.parser.parse_args()
@@ -48,7 +45,7 @@ class GameData(Resource):
         deltas, out_of_bounds = active_game.update_user(args['user-id'],
                                              args['long'],
                                              args['lat'])
-
+        resp = {}
         if out_of_bounds:
             resp['out-of-bounds'] = True
         deltas = [[(1, 2), constants.Team.RED]]
@@ -70,8 +67,8 @@ class GameData(Resource):
 class Lobby(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('lat', type=float, location='form', required=True)
-        self.parser.add_argument('long', type=float, location='form', required=True)
+        self.parser.add_argument('lat', type=float, required=True)
+        self.parser.add_argument('long', type=float, required=True)
 
     def post(self):
         global active_game
@@ -96,11 +93,14 @@ class Lobby(Resource):
         }
         if active_game.user_count == constants.lobby_size:
             resp['game-start-time'] = active_game.start_time.isoformat()
-            resp['center-coord'] = active_game.center_coord
+            resp['center-coord-x'] = active_game.center_coord[0]
+            resp['center-coord-y'] = active_game.center_coord[1]
             resp['radius'] = constants.radius
-            resp['gridsize'] = active_game.conversion_rates['lat_meters'] * constants.gridsize
+            resp['gridsize-longitude'] = 1 / active_game.conversion_rates['lat_meters'] * constants.gridsize 
+            resp['gridsize-latitude'] = 1 / active_game.conversion_rates['long_meters'] * constants.gridsize
         return resp
 
 # bind the APIs
 api.add_resource(GameData, '/game_data')
 api.add_resource(Lobby, '/join_lobby')
+api.add_resource(Reset, '/reset')
