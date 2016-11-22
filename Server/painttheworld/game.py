@@ -38,7 +38,7 @@ class GameState:
         self.user_count = 0
         self.user_coords = []
         self.user_grid = []
-        self.user_grid.extend([self.grid for i in range(constants.lobby_size)])
+        self.user_grid.extend([np.zeros((size, size), dtype=np.int8) for i in range(constants.lobby_size)])
 
     def start_game(self):
         """Initialize the starting position of the grid.
