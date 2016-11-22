@@ -84,10 +84,14 @@ class Lobby(Resource):
             active_game = GameState(constants.radius, constants.gridsize)
 
         usernum = active_game.add_user(args['lat'], args['long'])
-        return {
+
+        resp = {
             'user-id': usernum,
             'user-count': active_game.user_count
         }
+
+        
+        return resp
 
     def get(self):
         if active_game is None:
