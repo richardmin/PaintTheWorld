@@ -48,7 +48,6 @@ class GameData(Resource):
         resp = {}
         if out_of_bounds:
             resp['out-of-bounds'] = True
-        deltas = [[(1, 2), constants.Team.RED]]
         resp['grid-deltas'] = [fmt_diff(coord, team) for coord, team in deltas]
 
         return resp
