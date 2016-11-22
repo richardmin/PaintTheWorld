@@ -64,8 +64,6 @@ class GameState:
         """
         vert = GameState.haversine(self.center_coord[1], self.center_coord[0], self.center_coord[1], lat) # longitude is east-west, we ensure that's the sam'
         horiz = GameState.haversine(self.center_coord[1], self.center_coord[0], lon, self.center_coord[0])
-        print(vert)
-        print(horiz)
         """ Vectorizes the latitude. The degree ranges from -90 to 90.
             This latitude conversion doesn't handle poles.
             I'm not sure how to handle you playing the game at the north and south pole.
@@ -108,8 +106,6 @@ class GameState:
         elif self.center_coord[1] < 0: # Case 3
             horiz = -horiz
 
-        # print(vert)
-        # print(horiz)
 
         horiz = math.floor(horiz * 1000 / constants.gridsize)
         vert = math.floor(vert * 1000 / constants.gridsize)
@@ -142,8 +138,6 @@ class GameState:
                 self.grid[gridloc[0]][gridloc[1]] = constants.Team.findTeam(id)
 
             returngrid =  self.diff(self.user_grid[id], self.grid)
-            print(returngrid)
-            print(gridloc)
             self.user_grid[id] = self.grid
             return returngrid, out_of_bounds
         else:
