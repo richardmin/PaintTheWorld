@@ -48,11 +48,24 @@ public class LoginActivity extends AppCompatActivity implements
     private Calendar gameStartCalendar;
     private Calendar nowCalendar;
     private Intent switchToMaps;
+
+    // values we need to pass to maps activity
     private int user_id;
     private String gameStartTime;
+    private double centerCoordX;
+    private double centerCoordY;
+    private int radius;
+    private double gridsizeLongitude;
+    private double gridsizeLatitude;
 
     public final static String USER_ID = "painttheworld.USER_ID";
     public final static String GAME_ISO_TIME = "painttheworld.GAME_ISO_TIME";
+    public final static String CENTER_COORD_X = "painttheworld.CENTER_COORD_X";
+    public final static String CENTER_COORD_Y = "painttheworld.CENTER_COORD_Y";
+    public final static String RADIUS = "painttheworld.RADIUS";
+    public final static String GRIDSIZE_LONGITUDE = "painttheworld.GRIDSIZE_LONGITUDE";
+    public final static String GRIDSIZE_LATITUDE = "painttheworld.GRIDSIZE_LATITUDE";
+
     public static final int LOCATION_INTERVAL = 100;
     private static final String TAG = "LoginActivity";
 
@@ -75,6 +88,11 @@ public class LoginActivity extends AppCompatActivity implements
                 switchToMaps = new Intent(LoginActivity.this, MapsActivity.class);
                 switchToMaps.putExtra(USER_ID, user_id);
                 switchToMaps.putExtra(GAME_ISO_TIME, gameStartTime);
+                switchToMaps.putExtra(CENTER_COORD_X, centerCoordX);
+                switchToMaps.putExtra(CENTER_COORD_Y, centerCoordY);
+                switchToMaps.putExtra(RADIUS, radius);
+                switchToMaps.putExtra(GRIDSIZE_LONGITUDE, gridsizeLongitude);
+                switchToMaps.putExtra(GRIDSIZE_LATITUDE, gridsizeLatitude);
                 startActivity(switchToMaps);
                 pollingHandler.removeCallbacks(pollToSeeIfGameHasStarted);
             }
@@ -193,6 +211,11 @@ public class LoginActivity extends AppCompatActivity implements
                             }
                             pollingHandler.removeCallbacks(pollServerForStartTime);
                             gameStartTime = response.getString("game-start-time");
+                            centerCoordX = response.getDouble("center-coord-x");
+                            centerCoordY = response.getDouble("center-coord-y");
+                            radius = response.getInt("radius");
+                            gridsizeLongitude = response.getDouble("gridsize-longitude");
+                            gridsizeLatitude = response.getDouble("gridsize-latitude");
                             String now = ISO8601.now();
                             gameStartCalendar = Calendar.getInstance();
                             nowCalendar = Calendar.getInstance();
