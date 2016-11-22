@@ -135,7 +135,6 @@ class GameState:
             out_of_bounds = not self.inside_grid(gridloc)
             
             if not out_of_bounds:
-                print('out of bound thingy received: ', gridloc)
                 self.grid[gridloc] = constants.Team.findTeam(id)
 
             returngrid =  self.diff(self.user_grid[id], self.grid)
