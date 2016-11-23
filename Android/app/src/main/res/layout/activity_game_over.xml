@@ -36,5 +36,21 @@
         android:layout_gravity="center"
         android:textColor="#656565"
         android:textSize="20dp" />
+    <TextView android:id="@+id/BlueScoreHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Example"
+        android:layout_gravity="center"
+        android:textColor="#656565"
+        android:textSize="20dp" />
+    <TextView android:id="@+id/RedScoreHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Example"
+        android:layout_gravity="center"
+        android:textColor="#656565"
+        android:textSize="20dp" />
 
 </RelativeLayout>
