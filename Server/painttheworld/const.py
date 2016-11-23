@@ -1,10 +1,9 @@
 from enum import IntEnum
 
-# Game-related constants
-radius = 50    # 2500 tiles
-gridsize = 5   # 5 feet per tile
-lobby_size = 6
-active_game = None
+# Game related constants
+MAX_USERS = 6
+GRIDSIZE = 5
+RADIUS = 50
 
 # GPS-related constants
 m1 = 111132.92  # latitude calculation term 1
@@ -23,4 +22,4 @@ class Team(IntEnum):
     
     @staticmethod
     def findTeam(userid):
-        return 1 if userid < lobby_size/2 else 2
+        return 1 if userid < MAX_USERS/2 else 2
