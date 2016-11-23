@@ -12,7 +12,6 @@ from painttheworld.constants import active_game
 from painttheworld.game import GameState
 
 app = Flask(__name__)
-app.config.from_object('config')
 api = Api(app)
 
 def validate_coordinates(coord):
