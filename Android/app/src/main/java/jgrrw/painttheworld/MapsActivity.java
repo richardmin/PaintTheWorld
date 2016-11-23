@@ -251,6 +251,10 @@ public class MapsActivity extends FragmentActivity implements
         LatLng battlegroundCenter = new LatLng(centerX, centerY);
         float zoomLevel = 16.5f;
 
+        // Additional configuration of maps
+
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+
         mMap.addMarker(new MarkerOptions().position(battlegroundCenter).title("Center of battleground."));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(battlegroundCenter, zoomLevel));
 
@@ -301,8 +305,11 @@ public class MapsActivity extends FragmentActivity implements
                                             // check to see if game is over
                                             if (response.has("error")) {
                                                 String isGameOver = response.getString("error");
-                                                if (isGameOver == "Game over.") {
+                                                Log.d("error", isGameOver);
+                                                if (isGameOver.equals("Game over.")) {
                                                     gameOver();
+                                                    timer.cancel();
+                                                    timer.purge();
                                                     return;
                                                 }
                                                 else
@@ -323,6 +330,7 @@ public class MapsActivity extends FragmentActivity implements
                                             }
                                         } catch (JSONException e) {
                                             e.printStackTrace();
+                                            Log.d("error", e.getMessage());
                                         }
                                     }
                                 }, new Response.ErrorListener() {
