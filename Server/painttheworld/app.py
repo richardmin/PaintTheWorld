@@ -47,7 +47,7 @@ class GameData(Resource):
                 args['lat']
             )
         except RuntimeError as e:
-            return {'error': e.args[0]}, 400
+            return {'error': e.args[0]}, 200
 
         resp = {}
         if out_of_bounds:
