@@ -36,6 +36,7 @@ public class LoginActivity extends AppCompatActivity implements
     Button b1;
     View b;
     TextView tx1;
+    TextView text_waitforplayers;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest locationRequest;
     private LocationListener locationListener;
@@ -197,6 +198,8 @@ public class LoginActivity extends AppCompatActivity implements
         b.setVisibility(View.GONE);
         RequestQueue queue = Volley.newRequestQueue(this);
         String url ="http://ec2-54-153-39-233.us-west-1.compute.amazonaws.com/join_lobby";
+
+        tx1.setText("Waiting for game to start...");
 
         // Request a string response from the provided URL.
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null,
