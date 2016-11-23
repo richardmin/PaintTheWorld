@@ -32,15 +32,11 @@ public class GameOverActivity extends AppCompatActivity {
         redScoreText.setText(String.valueOf(redScore));
         blueScoreText.setText(String.valueOf(blueScore));
         // setPadding(left, top, right, bottom);
-        redScoreText.setPadding(0, 300, 400, 100);
-        blueScoreText.setPadding(400, 300, 0, 100);
         redScoreText.setTextColor(Color.parseColor("#FF0000"));
         blueScoreText.setTextColor(Color.parseColor("#0000FF"));
 
         redScoreTextHeader.setText("Red Score");
         blueScoreTextHeader.setText("Blue Score");
-        redScoreTextHeader.setPadding(0, 200, 400, 100);
-        blueScoreTextHeader.setPadding(400, 200, 0, 100);
 
     }
 }
