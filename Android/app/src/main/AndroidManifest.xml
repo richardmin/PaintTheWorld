@@ -38,6 +38,11 @@
             android:label="@string/title_activity_maps">
         </activity>
         <activity
+            android:name=".GameOverActivity"
+            android:label="GameOver"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
             android:name=".LoginActivity"
             android:label="Login"
             android:screenOrientation="portrait">
@@ -47,6 +52,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>
