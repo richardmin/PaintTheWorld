@@ -5,7 +5,7 @@
 
 __all__ = [ 'app' ]
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, json
 from flask_restful import reqparse, Resource, Api
 from painttheworld import const
 from painttheworld.const import active_game
@@ -14,39 +14,54 @@ from painttheworld.game import GameState
 app = Flask(__name__)
 api = Api(app)
 
-@app.route('/debug')
-def debug():
-    return render_template('debug.html')
-
-@app.route('/reset')
-def reset():
-    global active_game
-    active_game = None
-    
 def validate_coordinates(coord):
     lon, lat = coord
     return -180 <= lon <= 180 and -90 <= lat <= 90
 
+class Reset(Resource):
+    def get(self):
+        global active_game
+        active_game = None
+        return {'message': 'Reset successful, thank you for your business.'}
+
 class GameData(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('user-id', type=int, location='form', required=True)
-        self.parser.add_argument('long', type=float, location='form', required=True)
-        self.parser.add_argument('lat', type=float, location='form', required=True)
+        self.parser.add_argument('user-id', type=int, location='json', required=True)
+        self.parser.add_argument('long', type=float, location='json', required=True)
+        self.parser.add_argument('lat', type=float, location='json', required=True)
 
     def post(self):
         args = self.parser.parse_args()
         if active_game is None or active_game.start_time is None:
-            return {'error': 'No game in progress.'}, 400
+            return {'error': 'No game in progress.'}, 200
         elif args['user-id'] < 0 or args['user-id'] >= const.lobby_size:
             return {'error': 'Invalid user id.'}, 400
         elif not validate_coordinates((args['long'], args['lat'])):
             return {'error': 'Invalid coordinates.'}, 400
+        
+        try:
+            deltas, out_of_bounds = active_game.update_user(
+                args['user-id'],
+                args['long'],
+                args['lat']
+            )
+        except RuntimeError as e:
+            return {'error': e.args[0]}, 400
 
-        returngrid, out_of_bounds = active_game.update_user(request.form['id'],
-                                             request.form['long'],
-                                             request.form['lat'])
-        return {}
+        resp = {}
+        if out_of_bounds:
+            resp['out-of-bounds'] = True
+        resp['grid-deltas'] = [self.fmt_diff(coord, team) for coord, team in deltas]
+        return resp
+
+    @staticmethod
+    def fmt_diff(coord, team):
+        x, y = coord
+        return {
+            'coord': {'x': x.item(), 'y': y.item()},
+            'color': team.item()
+        }
 
 # TODO: Support multiple lobbies, probably in own file later
 # TODO: Make a game manager class that is in charge of cycling game state (a
@@ -54,8 +69,8 @@ class GameData(Resource):
 class Lobby(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('lat', type=float, location='form', required=True)
-        self.parser.add_argument('long', type=float, location='form', required=True)
+        self.parser.add_argument('lat', type=float, location='json', required=True)
+        self.parser.add_argument('long', type=float, location='json', required=True)
 
     def post(self):
         global active_game
@@ -63,13 +78,16 @@ class Lobby(Resource):
         if not validate_coordinates((args['long'], args['lat'])):
             return {'error': 'Invalid coordinates'}, 400
         if active_game is None:
-            active_game = GameState(const.radius, const.gridsize)
+            active_game = GameState()
 
-        usernum = active_game.add_user(request.form['lat'], request.form['long'])
-        return {
+        usernum = active_game.add_user(args['lat'], args['long'])
+
+        resp = {
             'user-id': usernum,
             'user-count': active_game.user_count
         }
+        
+        return resp
 
     def get(self):
         if active_game is None:
@@ -80,11 +98,14 @@ class Lobby(Resource):
         }
         if active_game.user_count == const.lobby_size:
             resp['game-start-time'] = active_game.start_time.isoformat()
-            resp['center-coord'] = active_game.center_coord
+            resp['center-coord-x'] = active_game.center_coord[0]
+            resp['center-coord-y'] = active_game.center_coord[1]
             resp['radius'] = const.radius
-            resp['gridsize'] = active_game.conversion_rates['lat_meters'] * const.gridsize
+            resp['gridsize-longitude'] = 1 / active_game.conversion_rates['lat_meters'] * const.gridsize 
+            resp['gridsize-latitude'] = 1 / active_game.conversion_rates['long_meters'] * const.gridsize
         return resp
 
 # bind the APIs
 api.add_resource(GameData, '/game_data')
 api.add_resource(Lobby, '/join_lobby')
+api.add_resource(Reset, '/reset')

@@ -1,0 +1,11 @@
+.header {
+    margin-top: 6rem;
+    text-align: center;
+}
+
+#join-game {
+    width: 20rem;
+    height: 8rem;
+    margin-top: 50vh;
+    font-size: 1.1em;
+}

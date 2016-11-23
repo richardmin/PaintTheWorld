@@ -32,12 +32,12 @@ class GameState:
             gridsize: The dimensions of a grid tile, in feet. This should be the
                 edge length
         """
-        size = 2*radius + 1
+        size = 2 * const.radius + 1
         self.grid = np.zeros((size, size), dtype=np.int8)
         self.user_count = 0
         self.user_coords = []
         self.user_grid = []
-        self.user_grid.extend([self.grid for i in range(const.lobby_size)])
+        self.user_grid.extend([self.grid] * const.lobby_size)
 
     def start_game(self):
         """Initialize the starting position of the grid.
@@ -47,9 +47,10 @@ class GameState:
         really how nautical miles work). Additionally, it sets the start time to
         be 3 seconds from now.
         """
-        self.center_coord = np.mean(self.user_coords, axis=1)
+        self.center_coord = np.mean(self.user_coords, axis=0)
         self.conversion_rates = conversion_rates(self.center_coord)
-        self.start_time = (datetime.datetime.now() + datetime.timedelta(seconds=3))
+        self.start_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
+        self.end_time = self.start_time + datetime.timedelta(minutes=1)
 
     def update(self, coord, team):
         """Update the game state array."""
@@ -60,14 +61,13 @@ class GameState:
         """ Casts a GPS coordinate onto the grid, which has it's central
         locations defined by center_coord.
         """
-        vert = haversine(self.center_coord, (self.center_coord[0], lat)) # longitude is east-west, we ensure that's the sam'
-        horiz = haversine(self.center_coord, (lon, self.center_coord[1]))
-
+        vert = haversine(self.center_coord[1], self.center_coord[0], self.center_coord[1], lat) # longitude is east-west, we ensure that's the sam'
+        horiz = haversine(self.center_coord[1], self.center_coord[0], lon, self.center_coord[0])
         """ Vectorizes the latitude. The degree ranges from -90 to 90.
             This latitude conversion doesn't handle poles.
             I'm not sure how to handle you playing the game at the north and south pole.
         """ 
-        if lat > self.center_coord[1]:
+        if lat > self.center_coord[0]:
             vert = -vert
 
         """ Vectorizes the longitude. The degree ranges from -180 to 180.
@@ -96,13 +96,13 @@ class GameState:
                 If the longitude of the central point is positive, the distance must be positive.
 
         """
-        if np.sign(self.center_coord[0]) == np.sign(lon): # Case 1
-            if lon > self.center_coord[0]:
+        if np.sign(self.center_coord[1]) == np.sign(lon): # Case 1
+            if lon > self.center_coord[1]:
                 horiz = -horiz
-        if math.fabs(self.center_coord[0] - lon) < 180: # Case 2
-            if self.center_coord[0] >= 0:
+        if math.fabs(self.center_coord[1] - lon) < 180: # Case 2
+            if self.center_coord[1] >= 0:
                 horiz = -horiz
-        elif self.center_coord[0] < 0: # Case 3
+        elif self.center_coord[1] < 0: # Case 3
             horiz = -horiz
 
         horiz = math.floor(horiz * 1000 / const.gridsize)
@@ -127,27 +127,40 @@ class GameState:
             return -1
 
     def update_user(self, id, lon, lat):
-        gridloc = project(lon, lat)
-        out_of_bounds = check_grid_range(gridloc[0], gridloc[1])
-        
-        if not out_of_bounds:
-            self.grid[gridloc] = const.Team.findTeam(id)
+        curtime = datetime.datetime.now()
+        if self.start_time < curtime < self.end_time: 
+            gridloc = self.project(lon, lat)
+            out_of_bounds = not self.inside_grid(gridloc)
+            
+            if not out_of_bounds:
+                self.grid[gridloc] = const.Team.findTeam(id)      
 
-        returngrid =  diff(grid, self.user_grid[id])
-        self.user_grid[id] = self.grid
-        return returngrid, out_of_bounds
+            returngrid =  self.diff(self.user_grid[id], self.grid)
+            np.copyto(self.user_grid[id], self.grid) 
+            return returngrid, out_of_bounds
+        else:
+            if self.start_time > curtime:
+                raise RuntimeError('Game hasn\'t started.')
+            else:
+                raise RuntimeError('Game over.')
 
-    def check_grid_range(self, coord):
-        return coord[0] >= 0 and coord[1] >=0 and coord[0] < const.radius*2+1 and coord[1] < const.radius*2+1
+    def inside_grid(self, coord):
+        lowest_coord = (0,0)
+        highest_coord = (const.radius*2 + 1, const.radius*2 + 1)
+        lower_bound = np.all(np.greater_equal(coord, lowest_coord))
+        upper_bound = np.all(np.less_equal(coord, highest_coord))
+        return lower_bound and upper_bound
          
     @staticmethod
     def diff(a, b):
         """Calculate the deltas of two GameState objects.
+            a is the "older" GameState object
+            b is the "updated" GameState object
 
         Returns:
             List of coordinate/team pairings of the form ((x,y), team_color).
         """
-        diff = np.absolute(a.grid - b.grid)
+        diff = np.absolute(a - b)
         coord = np.nonzero(diff)
         val = diff[coord]
         coord = map(tuple, np.transpose(coord))  # turn coord into (x,y) tuples

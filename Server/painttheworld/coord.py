@@ -1,4 +1,5 @@
 from painttheworld.const import m1, m2, m3, m4, p1, p2, p3
+import math
 
 def conversion_rates(coord):
     """Calculates the conversion rate for 1 degree of longitude to a variety
@@ -31,14 +32,12 @@ def conversion_rates(coord):
 
     return dict
 
-def haversine(coord1, coord2):
+def haversine(lon1, lat1, lon2, lat2):
     """
     Calculate the great circle distance between two points
     on the earth (specified in decimal degrees)
     Source code from: http://stackoverflow.com/questions/15736995/how-can-i-quickly-estimate-the-distance-between-two-latitude-longitude-points
     """
-    lon1, lat1 = coord1
-    lon2, lat2 = coord2
     # convert decimal degrees to radians
     lon1, lat1, lon2, lat2 = map(math.radians, [lon1, lat1, lon2, lat2])
     # haversine formula

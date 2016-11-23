@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import IntEnum
 
 # Game-related constants
 radius = 50    # 2500 tiles
@@ -16,7 +16,7 @@ p2 = -93.5      # longitude calculation term 2
 p3 = 0.118      # longitude calculation term 3
 
 # Teams
-class Team(Enum):
+class Team(IntEnum):
     NONE = 0
     RED  = 1
     BLUE = 2
