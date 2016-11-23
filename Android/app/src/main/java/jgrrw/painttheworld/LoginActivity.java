@@ -160,6 +160,9 @@ public class LoginActivity extends AppCompatActivity implements
         if (!locationIsValid) {
             return;
         }
+
+        b.setVisibility(View.GONE);
+
         final String URL = "http://ec2-54-153-39-233.us-west-1.compute.amazonaws.com/join_lobby";
         // Post params to be sent to the server
         HashMap<String, Double> params = new HashMap<String, Double>();
@@ -176,6 +179,8 @@ public class LoginActivity extends AppCompatActivity implements
                                 pollingHandler.post(pollServerForStartTime);
                             }
                             else {
+                                b.setVisibility(View.VISIBLE);
+
                                 Log.d("User_id", String.valueOf(user_id));
                                 tx1.setText("Please try again later.");
                             }
@@ -194,9 +199,10 @@ public class LoginActivity extends AppCompatActivity implements
     }
 
     private void waitForGame() {
-        b.setVisibility(View.GONE);
         RequestQueue queue = Volley.newRequestQueue(this);
         String url ="http://ec2-54-153-39-233.us-west-1.compute.amazonaws.com/join_lobby";
+
+        tx1.setText("Waiting for game to start...");
 
         // Request a string response from the provided URL.
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null,
