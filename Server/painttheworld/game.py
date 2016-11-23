@@ -51,7 +51,7 @@ class GameState:
         self.center_coord = np.mean(self.user_coords, axis=0)
         self.conversion_rates = self.conversion_rates(self.center_coord)
         self.start_time = datetime.datetime.now() + datetime.timedelta(seconds=3)
-        self.end_time = self.start_time + datetime.timedelta(minutes=3)
+        self.end_time = self.start_time + datetime.timedelta(minutes=1)
 
     def update(self, coord, team):
         """Update the game state array."""
@@ -132,6 +132,7 @@ class GameState:
         currtime = datetime.datetime.now()
         if self.start_time < currtime < self.end_time: 
             gridloc = self.project(lon, lat)
+            print(gridloc)
             out_of_bounds = not self.inside_grid(gridloc)
             
             if not out_of_bounds:
