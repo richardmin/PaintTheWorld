@@ -132,14 +132,13 @@ class GameState:
         currtime = datetime.datetime.now()
         if self.start_time < currtime < self.end_time: 
             gridloc = self.project(lon, lat)
-            print(gridloc)
             out_of_bounds = not self.inside_grid(gridloc)
             
             if not out_of_bounds:
-                self.grid[gridloc[0]][gridloc[1]] = constants.Team.findTeam(id)
+                self.grid[gridloc[0]][gridloc[1]] = constants.Team.findTeam(id)      
 
             returngrid =  self.diff(self.user_grid[id], self.grid)
-            self.user_grid[id] = self.grid
+            np.copyto(self.user_grid[id], self.grid) 
             return returngrid, out_of_bounds
         else:
             if self.start_time > currtime:
