@@ -19,6 +19,17 @@
         android:textColor="#656565"
         android:textSize="20dp" />
 
+    <TextView android:id="@+id/Waiting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Example"
+        android:layout_gravity="center"
+        android:textColor="#656565"
+        android:textSize="20dp"
+        android:paddingTop="300dp"
+        android:visibility="gone"/>
+
     <Button
         android:id = "@+id/JoinButton"
         android:layout_width = "wrap_content"
