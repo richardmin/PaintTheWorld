@@ -26,6 +26,8 @@
         android:text="Example"
         android:layout_gravity="center"
         android:textColor="#656565"
+        android:paddingTop="250dp"
+        android:paddingRight="140dp"
         android:textSize="20dp" />
 
     <TextView android:id="@+id/BlueScore"
@@ -33,6 +35,8 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="Example"
+        android:paddingTop="250dp"
+        android:paddingLeft="140dp"
         android:layout_gravity="center"
         android:textColor="#656565"
         android:textSize="20dp" />
@@ -40,6 +44,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:paddingTop="200dp"
+        android:paddingLeft="140dp"
         android:text="Example"
         android:layout_gravity="center"
         android:textColor="#656565"
@@ -49,6 +55,8 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="Example"
+        android:paddingTop="200dp"
+        android:paddingRight="140dp"
         android:layout_gravity="center"
         android:textColor="#656565"
         android:textSize="20dp" />
