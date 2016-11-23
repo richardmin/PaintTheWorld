@@ -28,13 +28,12 @@ class Reset(Resource):
 class GameData(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('user-id', type=int, required=True)
-        self.parser.add_argument('long', type=float, required=True)
-        self.parser.add_argument('lat', type=float, required=True)
+        self.parser.add_argument('user-id', type=int, location='json', required=True)
+        self.parser.add_argument('long', type=float, location='json', required=True)
+        self.parser.add_argument('lat', type=float, location='json', required=True)
 
     def post(self):
-        # args = self.parser.parse_args()
-        args = request.get_json(force=True)
+        args = self.parser.parse_args()
         if active_game is None or active_game.start_time is None:
             return {'error': 'No game in progress.'}, 400
         elif args['user-id'] < 0 or args['user-id'] >= constants.lobby_size:
@@ -71,13 +70,12 @@ class GameData(Resource):
 class Lobby(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('lat', type=float, required=True)
-        self.parser.add_argument('long', type=float, required=True)
+        self.parser.add_argument('lat', type=float, location='json', required=True)
+        self.parser.add_argument('long', type=float, location='json', required=True)
 
     def post(self):
         global active_game
-        # args = self.parser.parse_args()
-        args = request.get_json(force=True)
+        args = self.parser.parse_args()
         if not validate_coordinates((args['long'], args['lat'])):
             return {'error': 'Invalid coordinates'}, 400
         if active_game is None:
