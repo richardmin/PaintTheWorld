@@ -34,7 +34,7 @@ class GameData(Resource):
     def post(self):
         args = self.parser.parse_args()
         if active_game is None or active_game.start_time is None:
-            return {'error': 'No game in progress.'}, 400
+            return {'error': 'No game in progress.'}, 200
         elif args['user-id'] < 0 or args['user-id'] >= constants.lobby_size:
             return {'error': 'Invalid user id.'}, 400
         elif not validate_coordinates((args['long'], args['lat'])):
@@ -86,7 +86,6 @@ class Lobby(Resource):
             'user-id': usernum,
             'user-count': active_game.user_count
         }
-
         
         return resp
 
