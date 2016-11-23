@@ -341,18 +341,6 @@ public class MapsActivity extends FragmentActivity implements
 
                         // add the request object to the queue to be executed
                         ApplicationController.getInstance().addToRequestQueue(req);
-
-                        int x = 0;
-                        int y = 0;
-                        int colorCode = 1;
-                        drawPaintAt(x, y, colorCode);
-                        gameGrid[x][y] = colorCode;
-
-                        x = 5;
-                        y = 5;
-                        colorCode = 2;
-                        drawPaintAt(x, y, colorCode);
-                        gameGrid[x][y] = colorCode;
                     }
                 });
             }
