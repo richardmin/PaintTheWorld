@@ -18,12 +18,15 @@ def validate_coordinates(coord):
     lon, lat = coord
     return -180 <= lon <= 180 and -90 <= lat <= 90
 
+# /reset endpoint
+# clears the server's gamestate
 class Reset(Resource):
     def get(self):
         global active_game
         active_game = None
         return {'message': 'Reset successful, thank you for your business.'}
 
+# /game_date endpoint
 class GameData(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
@@ -31,6 +34,9 @@ class GameData(Resource):
         self.parser.add_argument('long', type=float, location='json', required=True)
         self.parser.add_argument('lat', type=float, location='json', required=True)
 
+    # retrieve new location from client (with input sanitization)
+    # - update the server's copy of the gamestate with any new state changes
+    # - return a list of gamestate changes to the client
     def post(self):
         args = self.parser.parse_args()
         if active_game is None or active_game.start_time is None:
@@ -63,15 +69,16 @@ class GameData(Resource):
             'color': team.item()
         }
 
-# TODO: Support multiple lobbies, probably in own file later
-# TODO: Make a game manager class that is in charge of cycling game state (a
-# game statemachine basically)
+
+# /join_lobby endpoint
 class Lobby(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('lat', type=float, location='json', required=True)
         self.parser.add_argument('long', type=float, location='json', required=True)
 
+    # client has requested to join game, take their coordinates and add them to
+    # the lobby of users waiting for the game to start
     def post(self):
         global active_game
         args = self.parser.parse_args()
@@ -89,6 +96,10 @@ class Lobby(Resource):
         
         return resp
 
+    # once the game has started, return information about the game including
+    # - when the game starts
+    # - where to center the grid on the map (average of all user's coordinates)
+    # - how big to make the grid and grid tiles
     def get(self):
         if active_game is None:
             return {'error': 'No game in progress.'}, 400
